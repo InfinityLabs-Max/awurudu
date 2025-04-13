@@ -40,6 +40,14 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
+    .btn-tertiary {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      transition: all 0.3s ease;
+    }
+    .btn-tertiary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
     .music-control {
       position: fixed;
       bottom: 20px;
@@ -51,6 +59,7 @@
       gap: 8px;
       margin-top: 12px;
       justify-content: center;
+      flex-wrap: wrap;
     }
     .share-btn {
       padding: 8px 12px;
@@ -78,6 +87,26 @@
     .ritual-item:hover {
       transform: translateY(-3px);
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .optional-text {
+      color: #6b7280;
+      font-style: italic;
+    }
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    .action-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
   </style>
 </head>
@@ -138,14 +167,20 @@
           </div>
           
           <div>
-            <label for="nameInput" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+            <label for="nameInput" class="block text-sm font-medium text-gray-700 mb-1">Your Name <span class="optional-text">(required)</span></label>
             <input id="nameInput" type="text" placeholder="Enter Your Name" 
                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
           </div>
           
           <div>
-            <label for="companyInput" class="block text-sm font-medium text-gray-700 mb-1">Company/Organization (Optional)</label>
+            <label for="companyInput" class="block text-sm font-medium text-gray-700 mb-1">Company/Organization <span class="optional-text">(optional)</span></label>
             <input id="companyInput" type="text" placeholder="Enter Company Name" 
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+          </div>
+
+          <div>
+            <label for="optionalText" class="block text-sm font-medium text-gray-700 mb-1">Custom Message <span class="optional-text">(optional)</span></label>
+            <input id="optionalText" type="text" placeholder="Enter custom message" 
                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
           </div>
           
@@ -153,10 +188,6 @@
             <button onclick="generateCard()" 
                     class="btn-primary text-white px-6 py-3 rounded-lg font-medium flex-1">
               Generate Card
-            </button>
-            <button onclick="downloadCard()" 
-                    class="btn-secondary text-white px-6 py-3 rounded-lg font-medium flex-1">
-              Download JPEG
             </button>
           </div>
         </div>
@@ -180,6 +211,12 @@
               <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
             </svg>
             Facebook
+          </button>
+          <button onclick="downloadCard()" class="share-btn btn-tertiary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            Download
           </button>
         </div>
       </div>
@@ -333,15 +370,16 @@
       }
       
       const company = document.getElementById("companyInput").value.trim();
+      const optionalText = document.getElementById("optionalText").value.trim();
       const lang = document.getElementById("language").value;
-      const nakath = getNextNakath();
       
       let message = "";
-      const companyText = company ? `<p class='mt-1 text-sm text-gray-600'>From ${company}</p>` : "";
+      const companyText = company ? `<p class='mt-1 text-sm text-gray-600'>${company}</p>` : "";
+      const optionalMessage = optionalText ? `<p class='mt-2 text-sm italic text-gray-700'>${optionalText}</p>` : "";
       const currentYear = new Date().getFullYear();
 
       // Traditional welcome girl image
-      const welcomeGirl = "https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png"; // Traditional welcome girl image
+      const welcomeGirl = "https://i.imgur.com/JQZ1h0G.png"; // Traditional welcome girl image
 
       // Card design with festive elements
       if (lang === "si") {
@@ -361,9 +399,7 @@
                 </div>
               </div>
               ${companyText}
-              <div class="mt-6 p-3 bg-white bg-opacity-50 rounded-lg">
-                <p class="text-sm font-medium text-green-700 sinhala-text">මීළඟ නැකත: ${nakath.name}</p>
-              </div>
+              ${optionalMessage}
               <div class="mt-8 text-xs text-gray-500">
                 <p class="sinhala-text">සුභ අලුත් අවුරුද්ද ${currentYear} - Infinity Lab</p>
                 <p class="mt-1"><a href="https://awurudulk.vercel.app" class="text-blue-500">awurudulk.vercel.app</a></p>
@@ -387,9 +423,7 @@
                 </div>
               </div>
               ${companyText}
-              <div class="mt-6 p-3 bg-white bg-opacity-50 rounded-lg">
-                <p class="text-sm font-medium text-green-700">அடுத்த நகாத்: ${nakath.name}</p>
-              </div>
+              ${optionalMessage}
               <div class="mt-8 text-xs text-gray-500">
                 <p>புத்தாண்டு வாழ்த்துக்கள் ${currentYear} - Infinity Lab</p>
                 <p class="mt-1"><a href="https://awurudulk.vercel.app" class="text-blue-500">awurudulk.vercel.app</a></p>
@@ -413,9 +447,7 @@
                 </div>
               </div>
               ${companyText}
-              <div class="mt-6 p-3 bg-white bg-opacity-50 rounded-lg">
-                <p class="text-sm font-medium text-green-700">Next Nakath: ${nakath.name}</p>
-              </div>
+              ${optionalMessage}
               <div class="mt-8 text-xs text-gray-500">
                 <p>Happy New Year ${currentYear} - Infinity Lab</p>
                 <p class="mt-1"><a href="https://awurudulk.vercel.app" class="text-blue-500">awurudulk.vercel.app</a></p>
@@ -456,19 +488,60 @@
     }
 
     function shareOnWhatsApp() {
+      const card = document.getElementById("card");
+      if (!card) {
+        alert("Please generate a card first before sharing");
+        return;
+      }
+      
       const name = document.getElementById("nameInput").value.trim();
       const text = `සුභ අලුත් අවුරුද්දක් වේවා! ${name} - Powered by Infinity Lab`;
-      const url = "https://awurudulk.vercel.app";
       
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}%0A%0A${encodeURIComponent(url)}`, '_blank');
+      html2canvas(card).then(canvas => {
+        const image = canvas.toDataURL("image/jpeg");
+        // Create temporary link
+        const link = document.createElement("a");
+        link.href = `https://wa.me/?text=${encodeURIComponent(text)}%0A%0A${encodeURIComponent(image)}`;
+        link.target = "_blank";
+        link.click();
+      });
     }
 
     function shareOnFacebook() {
+      const card = document.getElementById("card");
+      if (!card) {
+        alert("Please generate a card first before sharing");
+        return;
+      }
+      
       const name = document.getElementById("nameInput").value.trim();
       const text = `සුභ අලුත් අවුරුද්දක් වේවා! ${name} - Powered by Infinity Lab`;
-      const url = "https://awurudulk.vercel.app";
       
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`, '_blank');
+      html2canvas(card).then(canvas => {
+        const imageData = canvas.toDataURL("image/jpeg");
+        // Convert data URL to blob
+        fetch(imageData)
+          .then(res => res.blob())
+          .then(blob => {
+            const file = new File([blob], "avurudu-card.jpg", { type: "image/jpeg" });
+            const shareData = {
+              title: 'Avurudu Greeting Card',
+              text: text,
+              files: [file]
+            };
+            
+            if (navigator.canShare && navigator.canShare(shareData)) {
+              navigator.share(shareData)
+                .catch(err => console.log('Error sharing:', err));
+            } else {
+              // Fallback for browsers that don't support sharing files
+              const link = document.createElement("a");
+              link.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`;
+              link.target = "_blank";
+              link.click();
+            }
+          });
+      });
     }
   </script>
 </body>
