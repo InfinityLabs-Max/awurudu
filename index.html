@@ -8,11 +8,176 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
-      overflow-x: hidden;
+    /* Previous CSS styles remain the same */
+    .user-count-container {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 10px 20px;
+      border-radius: 25px;
+      display: inline-block;
+      margin: 10px auto;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .user-count {
+      font-weight: bold;
+      color: #d97706;
+      font-size: 1.2rem;
+    }
+    .total-users {
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body class="min-h-screen py-8 px-4">
+  <!-- Your existing header content -->
+  <header class="text-center mb-10">
+    <div class="user-count-container">
+      <div>Active Now: <span id="activeUserCount" class="user-count">0</span></div>
+      <div class="total-users">Total Celebrations: <span id="totalUserCount">0</span></div>
+    </div>
+    <!-- Rest of your header content -->
+  </header>
+
+  <!-- Rest of your HTML content -->
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCikU6TzMdAlulQebZD4GDfhnk4kw9Sjqw",
+      authDomain: "awurudu-c1cb4.firebaseapp.com",
+      databaseURL: "https://awurudu-c1cb4-default-rtdb.firebaseio.com",
+      projectId: "awurudu-c1cb4",
+      storageBucket: "awurudu-c1cb4.appspot.com",
+      messagingSenderId: "868976403654",
+      appId: "1:868976403654:web:c93f569d1147659f16e3c7",
+      measurementId: "G-YBM1YV7DTN"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const analytics = firebase.analytics();
+    const database = firebase.database();
+    const auth = firebase.auth();
+
+    // User tracking variables
+    let userId = null;
+    let userRef = null;
+    let userSessionRef = null;
+
+    // Initialize user tracking
+    function initUserTracking() {
+      auth.signInAnonymously()
+        .then((userCredential) => {
+          userId = userCredential.user.uid;
+          startUserSession();
+        })
+        .catch((error) => {
+          console.error("Anonymous auth error:", error);
+        });
+    }
+
+    // Start user session
+    function startUserSession() {
+      const sessionId = generateSessionId();
+      const userData = {
+        lastActive: firebase.database.ServerValue.TIMESTAMP,
+        firstSeen: firebase.database.ServerValue.TIMESTAMP,
+        userAgent: navigator.userAgent,
+        page: window.location.pathname
+      };
+
+      // Create session reference
+      userSessionRef = database.ref(`sessions/${userId}/${sessionId}`);
+      userSessionRef.set(userData);
+
+      // Update total users count if this is a new user
+      database.ref(`users/${userId}`).once('value').then((snapshot) => {
+        if (!snapshot.exists()) {
+          database.ref('stats/totalUsers').transaction((current) => {
+            return (current || 0) + 1;
+          });
+          database.ref(`users/${userId}`).set({
+            firstSeen: firebase.database.ServerValue.TIMESTAMP,
+            lastSeen: firebase.database.ServerValue.TIMESTAMP
+          });
+        } else {
+          database.ref(`users/${userId}`).update({
+            lastSeen: firebase.database.ServerValue.TIMESTAMP
+          });
+        }
+      });
+
+      // Update active status periodically
+      const updateInterval = setInterval(() => {
+        userSessionRef.update({
+          lastActive: firebase.database.ServerValue.TIMESTAMP
+        });
+      }, 30000);
+
+      // Clean up when user leaves
+      window.addEventListener('beforeunload', () => {
+        clearInterval(updateInterval);
+        userSessionRef.remove();
+      });
+
+      // Initialize user counters
+      initUserCounters();
+    }
+
+    // Generate unique session ID
+    function generateSessionId() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    // Initialize user counters
+    function initUserCounters() {
+      // Active users counter (users active in last 5 minutes)
+      database.ref('sessions').on('value', (snapshot) => {
+        const sessions = snapshot.val() || {};
+        let activeCount = 0;
+        
+        const now = Date.now();
+        Object.values(sessions).forEach(userSessions => {
+          Object.values(userSessions).forEach(session => {
+            if (now - session.lastActive < 300000) { // 5 minutes
+              activeCount++;
+            }
+          });
+        });
+        
+        document.getElementById('activeUserCount').textContent = activeCount;
+      });
+
+      // Total users counter
+      database.ref('stats/totalUsers').on('value', (snapshot) => {
+        const total = snapshot.val() || 0;
+        document.getElementById('totalUserCount').textContent = total;
+      });
+    }
+
+    // Start tracking when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      initUserTracking();
+      
+      // Your existing initialization code
+      startMusic();
+      updateCountdown();
+      
+      // Set up your existing event listeners
+      document.getElementById('generateCardBtn').addEventListener('click', generateCard);
+      // Other event listeners...
+    });
+
+   
     }
     .sinhala-text {
       font-family: 'Noto Sans Sinhala', sans-serif;
