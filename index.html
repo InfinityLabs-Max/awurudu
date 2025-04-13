@@ -7,10 +7,12 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #fef3c7, #fde68a);
+      overflow-x: hidden;
     }
     .sinhala-text {
       font-family: 'Noto Sans Sinhala', sans-serif;
@@ -92,21 +94,17 @@
       color: #6b7280;
       font-style: italic;
     }
-    .card-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-top: 16px;
+    .firework {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1000;
     }
-    .action-btn {
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    @keyframes firework {
+      0% { transform: translate(var(--x), var(--y)); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
     }
   </style>
 </head>
@@ -335,9 +333,61 @@
       { name: "රැකියාව ආරම්භය (Return to Work)", date: new Date("2025-04-17T09:03:00") }
     ];
 
+    let currentNakathIndex = 0;
+    let countdownCompleted = false;
+
     function getNextNakath() {
       const now = new Date();
-      return nakathList.find(n => n.date > now) || nakathList[nakathList.length - 1];
+      const nextNakath = nakathList.find(n => n.date > now) || nakathList[nakathList.length - 1];
+      const newIndex = nakathList.indexOf(nextNakath);
+      
+      if (newIndex !== currentNakathIndex) {
+        currentNakathIndex = newIndex;
+        if (!countdownCompleted) {
+          createFireworks();
+          countdownCompleted = true;
+          setTimeout(() => { countdownCompleted = false; }, 1000);
+        }
+      }
+      
+      return nextNakath;
+    }
+
+    function createFireworks() {
+      // Create canvas-confetti fireworks
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ff0000', '#ffff00', '#ff9900', '#00ff00', '#00ffff', '#9900ff']
+      });
+      
+      // Create custom firework elements
+      for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+          const firework = document.createElement('div');
+          firework.className = 'firework';
+          firework.style.backgroundColor = getRandomColor();
+          firework.style.left = `${Math.random() * 100}%`;
+          firework.style.top = `${Math.random() * 100}%`;
+          firework.style.setProperty('--x', '0px');
+          firework.style.setProperty('--y', '0px');
+          firework.style.setProperty('--tx', `${(Math.random() - 0.5) * 200}px`);
+          firework.style.setProperty('--ty', `${(Math.random() - 0.5) * 200}px`);
+          firework.style.animation = 'firework 1s forwards';
+          document.body.appendChild(firework);
+          
+          // Remove after animation
+          setTimeout(() => {
+            firework.remove();
+          }, 1000);
+        }, i * 100);
+      }
+    }
+
+    function getRandomColor() {
+      const colors = ['#ff0000', '#ffff00', '#ff9900', '#00ff00', '#00ffff', '#9900ff'];
+      return colors[Math.floor(Math.random() * colors.length)];
     }
 
     function updateCountdown() {
@@ -379,7 +429,7 @@
       const currentYear = new Date().getFullYear();
 
       // Traditional welcome girl image
-      const welcomeGirl = "https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png"; // Traditional welcome girl image
+      const welcomeGirl = "https://i.imgur.com/JQZ1h0G.png"; // Traditional welcome girl image
 
       // Card design with festive elements
       if (lang === "si") {
@@ -458,6 +508,7 @@
       
       document.getElementById("cardPreview").innerHTML = message;
       document.getElementById("shareButtons").classList.remove("hidden");
+      createFireworks(); // Add fireworks when card is generated
     }
 
     function downloadCard() {
@@ -484,6 +535,7 @@
         
         // Restore the music control after screenshot
         musicControl.style.visibility = 'visible';
+        createFireworks(); // Add fireworks when downloading
       });
     }
 
@@ -497,13 +549,45 @@
       const name = document.getElementById("nameInput").value.trim();
       const text = `සුභ අලුත් අවුරුද්දක් වේවා! ${name} - Powered by Infinity Lab`;
       
-      html2canvas(card).then(canvas => {
-        const image = canvas.toDataURL("image/jpeg");
-        // Create temporary link
-        const link = document.createElement("a");
-        link.href = `https://wa.me/?text=${encodeURIComponent(text)}%0A%0A${encodeURIComponent(image)}`;
-        link.target = "_blank";
-        link.click();
+      // Temporarily hide the music control for the screenshot
+      const musicControl = document.querySelector('.music-control');
+      musicControl.style.visibility = 'hidden';
+      
+      html2canvas(card, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        allowTaint: true
+      }).then(canvas => {
+        // Restore the music control after screenshot
+        musicControl.style.visibility = 'visible';
+        
+        // Convert canvas to blob
+        canvas.toBlob(function(blob) {
+          // Create form data
+          const formData = new FormData();
+          formData.append('file', blob, 'avurudu-card.jpg');
+          
+          // Create a temporary URL for the blob
+          const url = URL.createObjectURL(blob);
+          
+          // Create a temporary link element
+          const link = document.createElement('a');
+          link.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+          link.setAttribute('data-url', url);
+          link.setAttribute('data-text', text);
+          link.setAttribute('target', '_blank');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Clean up after some time
+          setTimeout(() => {
+            URL.revokeObjectURL(url);
+          }, 1000);
+          
+          createFireworks(); // Add fireworks when sharing
+        }, 'image/jpeg', 0.9);
       });
     }
 
@@ -517,30 +601,40 @@
       const name = document.getElementById("nameInput").value.trim();
       const text = `සුභ අලුත් අවුරුද්දක් වේවා! ${name} - Powered by Infinity Lab`;
       
-      html2canvas(card).then(canvas => {
-        const imageData = canvas.toDataURL("image/jpeg");
-        // Convert data URL to blob
-        fetch(imageData)
-          .then(res => res.blob())
-          .then(blob => {
-            const file = new File([blob], "avurudu-card.jpg", { type: "image/jpeg" });
-            const shareData = {
+      // Temporarily hide the music control for the screenshot
+      const musicControl = document.querySelector('.music-control');
+      musicControl.style.visibility = 'hidden';
+      
+      html2canvas(card, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        allowTaint: true
+      }).then(canvas => {
+        // Restore the music control after screenshot
+        musicControl.style.visibility = 'visible';
+        
+        // Convert canvas to blob
+        canvas.toBlob(function(blob) {
+          const file = new File([blob], "avurudu-card.jpg", { type: "image/jpeg" });
+          
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            navigator.share({
               title: 'Avurudu Greeting Card',
               text: text,
               files: [file]
-            };
-            
-            if (navigator.canShare && navigator.canShare(shareData)) {
-              navigator.share(shareData)
-                .catch(err => console.log('Error sharing:', err));
-            } else {
-              // Fallback for browsers that don't support sharing files
-              const link = document.createElement("a");
-              link.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`;
-              link.target = "_blank";
-              link.click();
-            }
-          });
+            }).catch(err => console.log('Error sharing:', err));
+          } else {
+            // Fallback for browsers that don't support sharing files
+            const url = canvas.toDataURL("image/jpeg", 0.9);
+            const link = document.createElement('a');
+            link.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
+            link.target = '_blank';
+            link.click();
+          }
+          
+          createFireworks(); // Add fireworks when sharing
+        }, 'image/jpeg', 0.9);
       });
     }
   </script>
