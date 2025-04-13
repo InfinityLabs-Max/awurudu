@@ -1,246 +1,475 @@
-<!DOCTYPE HTML>
-<!--
-	Phantom by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-	<head>
-		<title>Phantom by HTML5 UP</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
-	</head>
-	<body>
-		<!-- Wrapper -->
-			<div id="wrapper">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avurudu 2025 - Greeting Card & Nakath Countdown</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+    }
+    .sinhala-text {
+      font-family: 'Noto Sans Sinhala', sans-serif;
+    }
+    .festive-border {
+      border-image: linear-gradient(45deg, #d97706, #f59e0b, #fbbf24, #f59e0b, #d97706) 1;
+    }
+    .card-shadow {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .countdown-bg {
+      background: linear-gradient(135deg, #4c1d95, #7c3aed);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      transition: all 0.3s ease;
+    }
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .music-control {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+    .share-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      justify-content: center;
+    }
+    .share-btn {
+      padding: 8px 12px;
+      border-radius: 4px;
+      color: white;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .share-btn:hover {
+      transform: translateY(-2px);
+    }
+    .whatsapp-btn {
+      background-color: #25D366;
+    }
+    .facebook-btn {
+      background-color: #3b5998;
+    }
+    .ritual-item {
+      transition: all 0.3s ease;
+    }
+    .ritual-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+  </style>
+</head>
+<body class="min-h-screen py-8 px-4" onload="startMusic()">
+  <!-- Audio Element -->
+  <audio id="backgroundMusic" loop>
+    <source src="https://github.com/InfinityLabs-Max/awurudu/raw/refs/heads/master/Sirilaka%20Piri%20Aurudu%20Siri%20-%20Sinhala%20Aluth%20Aurudu%20Song%20Karoke%20Without%20Voice.mp3" type="audio/mpeg">
+  </audio>
+  
+  <!-- Music Control -->
+  <div class="music-control">
+    <button onclick="toggleMusic()" class="bg-white p-3 rounded-full shadow-lg hover:bg-gray-100">
+      <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </button>
+  </div>
 
-				<!-- Header -->
-					<header id="header">
-						<div class="inner">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header Section -->
+    <header class="text-center mb-10">
+      <div class="inline-block mb-4">
+        <div class="flex items-center justify-center space-x-2">
+          <img src="https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png" alt="Avurudu" class="h-12 w-12">
+          <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-yellow-500">
+            Sinhala & Tamil New Year 2025
+          </h1>
+          <img src="https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png" alt="Avurudu" class="h-12 w-12">
+        </div>
+        <div class="h-1 mt-2 bg-gradient-to-r from-red-500 via-yellow-500 to-red-500 rounded-full"></div>
+      </div>
+      
+      <div class="countdown-bg text-white rounded-xl p-4 max-w-2xl mx-auto card-shadow">
+        <h2 class="text-xl font-semibold mb-2">Countdown to Next Nakath</h2>
+        <div id="countdown" class="text-2xl font-mono font-bold text-yellow-200"></div>
+        <div id="nakath-name" class="mt-2 text-lg font-medium"></div>
+      </div>
+    </header>
 
-							<!-- Logo -->
-								<a href="index.html" class="logo">
-									<span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">Phantom</span>
-								</a>
+    <!-- Main Content -->
+    <main class="grid md:grid-cols-2 gap-8">
+      <!-- Greeting Card Generator -->
+      <div class="bg-white rounded-2xl p-6 card-shadow">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create Your Greeting Card</h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label for="language" class="block text-sm font-medium text-gray-700 mb-1">Language</label>
+            <select id="language" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+              <option value="si">සිංහල (Sinhala)</option>
+              <option value="en">English</option>
+              <option value="ta">தமிழ் (Tamil)</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="nameInput" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+            <input id="nameInput" type="text" placeholder="Enter Your Name" 
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+          </div>
+          
+          <div>
+            <label for="companyInput" class="block text-sm font-medium text-gray-700 mb-1">Company/Organization (Optional)</label>
+            <input id="companyInput" type="text" placeholder="Enter Company Name" 
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
+          </div>
+          
+          <div class="flex space-x-3 pt-2">
+            <button onclick="generateCard()" 
+                    class="btn-primary text-white px-6 py-3 rounded-lg font-medium flex-1">
+              Generate Card
+            </button>
+            <button onclick="downloadCard()" 
+                    class="btn-secondary text-white px-6 py-3 rounded-lg font-medium flex-1">
+              Download JPEG
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Card Preview -->
+      <div class="flex flex-col">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">Your Card Preview</h3>
+        <div id="cardPreview" class="flex-1 flex items-center justify-center p-4 bg-gray-50 rounded-2xl min-h-64">
+          <p class="text-gray-400">Your greeting card will appear here</p>
+        </div>
+        <div id="shareButtons" class="share-buttons hidden">
+          <button onclick="shareOnWhatsApp()" class="share-btn whatsapp-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+            </svg>
+            WhatsApp
+          </button>
+          <button onclick="shareOnFacebook()" class="share-btn facebook-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
+            </svg>
+            Facebook
+          </button>
+        </div>
+      </div>
+    </main>
 
-							<!-- Nav -->
-								<nav>
-									<ul>
-										<li><a href="#menu">Menu</a></li>
-									</ul>
-								</nav>
+    <!-- Nakath Times Section -->
+    <section class="mt-12 bg-white rounded-2xl p-6 card-shadow">
+      <h2 class="text-2xl font-bold text-center mb-6">Sinhala Avurudu Rituals 2025</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="ritual-item bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+          <h3 class="font-semibold text-yellow-800 sinhala-text">නව සඳ බැලීම</h3>
+          <p class="text-gray-700">Observing the New Moon</p>
+          <p class="text-gray-600">March 30 (Sun) & May 1 (Thu)</p>
+          <p class="text-sm mt-2 text-gray-700">The new moon is observed as an important transition in the Sinhala New Year calendar.</p>
+        </div>
+        <div class="ritual-item bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+          <h3 class="font-semibold text-red-800 sinhala-text">පරණ අවුරුද්ද සඳහා ස්නානය</h3>
+          <p class="text-gray-700">Ritual Bath for the Old Year</p>
+          <p class="text-gray-600">April 13 (Sun)</p>
+          <p class="text-sm mt-2 text-gray-700">Take a herbal bath using Divul leaves juice before the old year ends.</p>
+        </div>
+        <div class="ritual-item bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+          <h3 class="font-semibold text-green-800 sinhala-text">අලුත් අවුරුදු උදාව</h3>
+          <p class="text-gray-700">Dawn of the New Year</p>
+          <p class="text-gray-600">April 14 (Mon) 3:21 AM</p>
+          <p class="text-sm mt-2 text-gray-700">Official transition from the old year to the new. Light lamps and begin rituals.</p>
+        </div>
+        <div class="ritual-item bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+          <h3 class="font-semibold text-blue-800 sinhala-text">පුණ්ය කාලය</h3>
+          <p class="text-gray-700">Neutral Period</p>
+          <p class="text-gray-600">April 13, 8:57 PM to April 14, 9:45 AM</p>
+          <p class="text-sm mt-2 text-gray-700">All work paused for religious activities. First meal prepared during auspicious time.</p>
+        </div>
+        <div class="ritual-item bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+          <h3 class="font-semibold text-purple-800 sinhala-text">ආහර පිසීම</h3>
+          <p class="text-gray-700">First Meal Preparation</p>
+          <p class="text-gray-600">April 14, 4:04 AM</p>
+          <p class="text-sm mt-2 text-gray-700">Wear copper-colored clothes, face south, prepare kiribath and sweetmeats.</p>
+        </div>
+        <div class="ritual-item bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500">
+          <h3 class="font-semibold text-indigo-800 sinhala-text">වැඩ ඇල්ලීම</h3>
+          <p class="text-gray-700">Starting Work & Transactions</p>
+          <p class="text-gray-600">April 14, 6:44 AM</p>
+          <p class="text-sm mt-2 text-gray-700">Wear white clothes, face south, resume work and share first meal.</p>
+        </div>
+        <div class="ritual-item bg-pink-50 p-4 rounded-lg border-l-4 border-pink-500">
+          <h3 class="font-semibold text-pink-800 sinhala-text">හිසතෙල් ගෑම</h3>
+          <p class="text-gray-700">Anointing of Oil</p>
+          <p class="text-gray-600">April 16, 9:04 AM</p>
+          <p class="text-sm mt-2 text-gray-700">Wear green clothes, face north, apply herbal oil with kohomba leaves.</p>
+        </div>
+        <div class="ritual-item bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
+          <h3 class="font-semibold text-teal-800 sinhala-text">රැකීරක්ෂා සඳහා පිටත්ව යෑම</h3>
+          <p class="text-gray-700">Stepping Out for Prosperity</p>
+          <p class="text-gray-600">April 17, 9:03 AM</p>
+          <p class="text-sm mt-2 text-gray-700">Wear gold clothes, eat kiribath, face north to begin new journeys.</p>
+        </div>
+      </div>
+    </section>
 
-						</div>
-					</header>
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-gray-600">
+      <div class="flex items-center justify-center space-x-2 mb-2">
+        <img src="https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png" alt="Avurudu" class="h-8 w-8">
+        <p class="text-sm">Powered by <strong class="text-yellow-600">Infinity Lab</strong></p>
+      </div>
+      <a href="https://awurudulk.vercel.app" class="text-blue-500 hover:underline text-sm">
+        awurudulk.vercel.app
+      </a>
+    </footer>
+  </div>
 
-				<!-- Menu -->
-					<nav id="menu">
-						<h2>Menu</h2>
-						<ul>
-							<li><a href="index.html">Home</a></li>
-							<li><a href="generic.html">Ipsum veroeros</a></li>
-							<li><a href="generic.html">Tempus etiam</a></li>
-							<li><a href="generic.html">Consequat dolor</a></li>
-							<li><a href="elements.html">Elements</a></li>
-						</ul>
-					</nav>
+  <script>
+    // Background Music Control
+    const music = document.getElementById('backgroundMusic');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    
+    function startMusic() {
+      // Try to autoplay music (may be blocked by browser policies)
+      const promise = music.play();
+      if (promise !== undefined) {
+        promise.catch(error => {
+          // Auto-play was prevented, show paused state
+          playIcon.classList.remove('hidden');
+          pauseIcon.classList.add('hidden');
+        }).then(() => {
+          // Auto-play worked, show playing state
+          playIcon.classList.add('hidden');
+          pauseIcon.classList.remove('hidden');
+        });
+      }
+    }
+    
+    function toggleMusic() {
+      if (music.paused) {
+        music.play();
+        playIcon.classList.add('hidden');
+        pauseIcon.classList.remove('hidden');
+      } else {
+        music.pause();
+        playIcon.classList.remove('hidden');
+        pauseIcon.classList.add('hidden');
+      }
+    }
+    
+    // Set music volume to medium
+    music.volume = 0.5;
 
-				<!-- Main -->
-					<div id="main">
-						<div class="inner">
-							<header>
-								<h1>This is Phantom, a free, fully responsive site<br />
-								template designed by <a href="http://html5up.net">HTML5 UP</a>.</h1>
-								<p>Etiam quis viverra lorem, in semper lorem. Sed nisl arcu euismod sit amet nisi euismod sed cursus arcu elementum ipsum arcu vivamus quis venenatis orci lorem ipsum et magna feugiat veroeros aliquam. Lorem ipsum dolor sit amet nullam dolore.</p>
-							</header>
-							<section class="tiles">
-								<article class="style1">
-									<span class="image">
-										<img src="images/pic01.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Magna</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style2">
-									<span class="image">
-										<img src="images/pic02.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Lorem</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style3">
-									<span class="image">
-										<img src="images/pic03.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Feugiat</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style4">
-									<span class="image">
-										<img src="images/pic04.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Tempus</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style5">
-									<span class="image">
-										<img src="images/pic05.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Aliquam</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style6">
-									<span class="image">
-										<img src="images/pic06.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Veroeros</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style2">
-									<span class="image">
-										<img src="images/pic07.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Ipsum</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style3">
-									<span class="image">
-										<img src="images/pic08.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Dolor</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style1">
-									<span class="image">
-										<img src="images/pic09.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Nullam</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style5">
-									<span class="image">
-										<img src="images/pic10.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Ultricies</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style6">
-									<span class="image">
-										<img src="images/pic11.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Dictum</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-								<article class="style4">
-									<span class="image">
-										<img src="images/pic12.jpg" alt="" />
-									</span>
-									<a href="generic.html">
-										<h2>Pretium</h2>
-										<div class="content">
-											<p>Sed nisl arcu euismod sit amet nisi lorem etiam dolor veroeros et feugiat.</p>
-										</div>
-									</a>
-								</article>
-							</section>
-						</div>
-					</div>
+    const nakathList = [
+      { name: "පුණ්‍ය කාලය (Punya Kalaya)", date: new Date("2025-04-13T20:57:00") },
+      { name: "අලුත් අවුරුද්ද (Aluth Avurudda)", date: new Date("2025-04-14T03:21:00") },
+      { name: "ආහාර පිසීම (Food Preparation)", date: new Date("2025-04-14T04:04:00") },
+      { name: "වැඩ ඇල්ලීම (Work Commencement)", date: new Date("2025-04-14T06:44:00") },
+      { name: "හිසතෙල් ගෑම (Anointing Oil)", date: new Date("2025-04-16T09:04:00") },
+      { name: "රැකියාව ආරම්භය (Return to Work)", date: new Date("2025-04-17T09:03:00") }
+    ];
 
-				<!-- Footer -->
-					<footer id="footer">
-						<div class="inner">
-							<section>
-								<h2>Get in touch</h2>
-								<form method="post" action="#">
-									<div class="field half first">
-										<input type="text" name="name" id="name" placeholder="Name" />
-									</div>
-									<div class="field half">
-										<input type="email" name="email" id="email" placeholder="Email" />
-									</div>
-									<div class="field">
-										<textarea name="message" id="message" placeholder="Message"></textarea>
-									</div>
-									<ul class="actions">
-										<li><input type="submit" value="Send" class="special" /></li>
-									</ul>
-								</form>
-							</section>
-							<section>
-								<h2>Follow</h2>
-								<ul class="icons">
-									<li><a href="#" class="icon style2 fa-twitter"><span class="label">Twitter</span></a></li>
-									<li><a href="#" class="icon style2 fa-facebook"><span class="label">Facebook</span></a></li>
-									<li><a href="#" class="icon style2 fa-instagram"><span class="label">Instagram</span></a></li>
-									<li><a href="#" class="icon style2 fa-dribbble"><span class="label">Dribbble</span></a></li>
-									<li><a href="#" class="icon style2 fa-github"><span class="label">GitHub</span></a></li>
-									<li><a href="#" class="icon style2 fa-500px"><span class="label">500px</span></a></li>
-									<li><a href="#" class="icon style2 fa-phone"><span class="label">Phone</span></a></li>
-									<li><a href="#" class="icon style2 fa-envelope-o"><span class="label">Email</span></a></li>
-								</ul>
-							</section>
-							<ul class="copyright">
-								<li>&copy; Untitled. All rights reserved</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-							</ul>
-						</div>
-					</footer>
+    function getNextNakath() {
+      const now = new Date();
+      return nakathList.find(n => n.date > now) || nakathList[nakathList.length - 1];
+    }
 
-			</div>
+    function updateCountdown() {
+      const nextNakath = getNextNakath();
+      if (!nextNakath) return;
+      
+      const diff = nextNakath.date - new Date();
+      if (diff <= 0) return;
+      
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      
+      let countdownText = '';
+      if (days > 0) countdownText += `${days}d `;
+      countdownText += `${hours}h ${minutes}m ${seconds}s`;
+      
+      document.getElementById("countdown").textContent = countdownText;
+      document.getElementById("nakath-name").textContent = nextNakath.name;
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/skel.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
-			<script src="assets/js/main.js"></script>
+    function generateCard() {
+      const name = document.getElementById("nameInput").value.trim();
+      if (!name) {
+        alert("Please enter your name to generate the card");
+        return;
+      }
+      
+      const company = document.getElementById("companyInput").value.trim();
+      const lang = document.getElementById("language").value;
+      const nakath = getNextNakath();
+      
+      let message = "";
+      const companyText = company ? `<p class='mt-1 text-sm text-gray-600'>From ${company}</p>` : "";
+      const currentYear = new Date().getFullYear();
 
-	</body>
+      // Traditional welcome girl image
+      const welcomeGirl = "https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png"; // Traditional welcome girl image
+
+      // Card design with festive elements
+      if (lang === "si") {
+        message = `
+          <div id="card" class="w-full max-w-md p-8 rounded-2xl bg-gradient-to-br from-yellow-50 to-red-50 border-4 border-yellow-400 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-red-500 rounded-full opacity-10 -mr-10 -mt-10"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-yellow-500 rounded-full opacity-10 -ml-16 -mb-16"></div>
+            
+            <div class="relative z-10 text-center">
+              <div class="flex justify-center mb-4">
+                <img src="${welcomeGirl}" alt="Traditional Welcome Girl" class="h-32">
+              </div>
+              <h3 class="text-2xl font-bold text-red-600 mb-2 sinhala-text">සුභ අලුත් අවුරුද්දක් වේවා!</h3>
+              <div class="my-4">
+                <div class="inline-block border-t-2 border-b-2 border-yellow-400 px-6 py-1">
+                  <p class="text-3xl font-bold text-gray-800">${name}</p>
+                </div>
+              </div>
+              ${companyText}
+              <div class="mt-6 p-3 bg-white bg-opacity-50 rounded-lg">
+                <p class="text-sm font-medium text-green-700 sinhala-text">මීළඟ නැකත: ${nakath.name}</p>
+              </div>
+              <div class="mt-8 text-xs text-gray-500">
+                <p class="sinhala-text">සුභ අලුත් අවුරුද්ද ${currentYear} - Infinity Lab</p>
+                <p class="mt-1"><a href="https://awurudulk.vercel.app" class="text-blue-500">awurudulk.vercel.app</a></p>
+              </div>
+            </div>
+          </div>`;
+      } else if (lang === "ta") {
+        message = `
+          <div id="card" class="w-full max-w-md p-8 rounded-2xl bg-gradient-to-br from-yellow-50 to-red-50 border-4 border-yellow-400 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-red-500 rounded-full opacity-10 -mr-10 -mt-10"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-yellow-500 rounded-full opacity-10 -ml-16 -mb-16"></div>
+            
+            <div class="relative z-10 text-center">
+              <div class="flex justify-center mb-4">
+                <img src="${welcomeGirl}" alt="Traditional Welcome Girl" class="h-32">
+              </div>
+              <h3 class="text-2xl font-bold text-red-600 mb-2">புத்தாண்டு வாழ்த்துக்கள்!</h3>
+              <div class="my-4">
+                <div class="inline-block border-t-2 border-b-2 border-yellow-400 px-6 py-1">
+                  <p class="text-3xl font-bold text-gray-800">${name}</p>
+                </div>
+              </div>
+              ${companyText}
+              <div class="mt-6 p-3 bg-white bg-opacity-50 rounded-lg">
+                <p class="text-sm font-medium text-green-700">அடுத்த நகாத்: ${nakath.name}</p>
+              </div>
+              <div class="mt-8 text-xs text-gray-500">
+                <p>புத்தாண்டு வாழ்த்துக்கள் ${currentYear} - Infinity Lab</p>
+                <p class="mt-1"><a href="https://awurudulk.vercel.app" class="text-blue-500">awurudulk.vercel.app</a></p>
+              </div>
+            </div>
+          </div>`;
+      } else {
+        message = `
+          <div id="card" class="w-full max-w-md p-8 rounded-2xl bg-gradient-to-br from-yellow-50 to-red-50 border-4 border-yellow-400 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-red-500 rounded-full opacity-10 -mr-10 -mt-10"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-yellow-500 rounded-full opacity-10 -ml-16 -mb-16"></div>
+            
+            <div class="relative z-10 text-center">
+              <div class="flex justify-center mb-4">
+                <img src="${welcomeGirl}" alt="Traditional Welcome Girl" class="h-32">
+              </div>
+              <h3 class="text-2xl font-bold text-red-600 mb-2">Happy Sinhala & Tamil New Year!</h3>
+              <div class="my-4">
+                <div class="inline-block border-t-2 border-b-2 border-yellow-400 px-6 py-1">
+                  <p class="text-3xl font-bold text-gray-800">${name}</p>
+                </div>
+              </div>
+              ${companyText}
+              <div class="mt-6 p-3 bg-white bg-opacity-50 rounded-lg">
+                <p class="text-sm font-medium text-green-700">Next Nakath: ${nakath.name}</p>
+              </div>
+              <div class="mt-8 text-xs text-gray-500">
+                <p>Happy New Year ${currentYear} - Infinity Lab</p>
+                <p class="mt-1"><a href="https://awurudulk.vercel.app" class="text-blue-500">awurudulk.vercel.app</a></p>
+              </div>
+            </div>
+          </div>`;
+      }
+      
+      document.getElementById("cardPreview").innerHTML = message;
+      document.getElementById("shareButtons").classList.remove("hidden");
+    }
+
+    function downloadCard() {
+      const card = document.getElementById("card");
+      if (!card) {
+        alert("Please generate a card first before downloading");
+        return;
+      }
+      
+      // Temporarily hide the music control for the screenshot
+      const musicControl = document.querySelector('.music-control');
+      musicControl.style.visibility = 'hidden';
+      
+      html2canvas(card, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        allowTaint: true
+      }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = `avurudu-greeting-${new Date().getTime()}.jpeg`;
+        link.href = canvas.toDataURL("image/jpeg", 0.9);
+        link.click();
+        
+        // Restore the music control after screenshot
+        musicControl.style.visibility = 'visible';
+      });
+    }
+
+    function shareOnWhatsApp() {
+      const name = document.getElementById("nameInput").value.trim();
+      const text = `සුභ අලුත් අවුරුද්දක් වේවා! ${name} - Powered by Infinity Lab`;
+      const url = "https://awurudulk.vercel.app";
+      
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}%0A%0A${encodeURIComponent(url)}`, '_blank');
+    }
+
+    function shareOnFacebook() {
+      const name = document.getElementById("nameInput").value.trim();
+      const text = `සුභ අලුත් අවුරුද්දක් වේවා! ${name} - Powered by Infinity Lab`;
+      const url = "https://awurudulk.vercel.app";
+      
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`, '_blank');
+    }
+  </script>
+</body>
 </html>
