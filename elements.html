@@ -1,419 +1,1100 @@
-<!DOCTYPE HTML>
-<!--
-	Phantom by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-	<head>
-		<title>Elements - Phantom by HTML5 UP</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
-	</head>
-	<body>
-		<!-- Wrapper -->
-			<div id="wrapper">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Attendance & Fees Management</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --success-color: #4cc9f0;
+      --danger-color: #f72585;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      line-height: 1.6;
+      color: var(--dark-color);
+      background-color: #f5f7fa;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .hidden { display: none; }
+    
+    h1, h2, h3, h4 {
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+    
+    button, .btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    button:hover, .btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+    
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .btn-success {
+      background-color: #4cc9f0;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .alert {
+      padding: 10px 15px;
+      border-radius: var(--border-radius);
+      margin: 10px 0;
+    }
+    
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 500;
+    }
+    
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-present {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .status-absent {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .status-paid {
+      background-color: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .status-unpaid {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto;
+      border: 2px dashed #ccc;
+      border-radius: var(--border-radius);
+      padding: 10px;
+    }
+    
+    .student-info-card {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .info-item {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: var(--border-radius);
+    }
+    
+    .info-label {
+      font-size: 12px;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+    
+    .info-value {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .nav-tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom: 3px solid var(--primary-color);
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .student-info-card {
+        grid-template-columns: 1fr;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+    
+    /* Loading spinner */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
 
-				<!-- Header -->
-					<header id="header">
-						<div class="inner">
+    /* Print styles */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-section, #print-section * {
+        visibility: visible;
+      }
+      #print-section {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Login Section -->
+    <div id="login" class="card">
+      <h2><i class="fas fa-user-shield"></i> Teacher Login</h2>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+      </div>
+      <button onclick="login()"><i class="fas fa-sign-in-alt"></i> Login</button>
+      <div id="login-status" class="alert hidden"></div>
+    </div>
 
-							<!-- Logo -->
-								<a href="index.html" class="logo">
-									<span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">Phantom</span>
-								</a>
+    <!-- Main Dashboard (hidden initially) -->
+    <div id="dashboard" class="hidden">
+      <h1><i class="fas fa-user-graduate"></i> Student Management System</h1>
+      
+      <div class="nav-tabs">
+        <div class="tab active" onclick="switchTab('scanner-tab')"><i class="fas fa-qrcode"></i> Scanner</div>
+        <div class="tab" onclick="switchTab('add-student-tab')"><i class="fas fa-user-plus"></i> Add Student</div>
+        <div class="tab" onclick="switchTab('student-list-tab')"><i class="fas fa-users"></i> Student List</div>
+        <div class="tab" onclick="switchTab('reports-tab')"><i class="fas fa-chart-bar"></i> Reports</div>
+        <div class="tab no-print" onclick="logout()" style="margin-left: auto;"><i class="fas fa-sign-out-alt"></i> Logout</div>
+      </div>
+      
+      <!-- Scanner Tab -->
+      <div id="scanner-tab" class="tab-content active">
+        <div class="card">
+          <h3><i class="fas fa-qrcode"></i> Scan Student QR Code</h3>
+          <div id="reader"></div>
+          <div id="scan-status" class="alert hidden"></div>
+        </div>
 
-							<!-- Nav -->
-								<nav>
-									<ul>
-										<li><a href="#menu">Menu</a></li>
-									</ul>
-								</nav>
+        <div id="student-info" class="card hidden">
+          <h3><i class="fas fa-user-circle"></i> Student Information</h3>
+          <div class="student-info-card">
+            <div class="info-item">
+              <div class="info-label">Student ID</div>
+              <div class="info-value" id="s-id">-</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Name</div>
+              <div class="info-value" id="s-name">-</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Grade</div>
+              <div class="info-value" id="s-grade">-</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Today's Attendance</div>
+              <div class="info-value"><span id="s-attendance" class="status-badge">-</span></div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">This Month's Fee</div>
+              <div class="info-value"><span id="s-fee" class="status-badge">-</span></div>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <button onclick="markAttendance()" id="attendance-btn"><i class="fas fa-calendar-check"></i> Mark Attendance</button>
+            <button onclick="toggleFee()" id="fee-btn"><i class="fas fa-money-bill-wave"></i> Toggle Fee Status</button>
+            <button onclick="viewStudentHistory()" class="btn-success"><i class="fas fa-history"></i> View History</button>
+            <button onclick="printStudentCard()" class="btn"><i class="fas fa-print"></i> Print ID Card</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Add Student Tab -->
+      <div id="add-student-tab" class="tab-content">
+        <div class="card">
+          <h3><i class="fas fa-user-plus"></i> Add New Student</h3>
+          <div class="form-group">
+            <label for="new-name">Full Name</label>
+            <input type="text" id="new-name" placeholder="Enter student's full name" required>
+          </div>
+          <div class="form-group">
+            <label for="new-grade">Grade/Class</label>
+            <input type="text" id="new-grade" placeholder="Enter grade/class" required>
+          </div>
+          <div class="form-group">
+            <label for="new-age">Age</label>
+            <input type="number" id="new-age" placeholder="Enter age" min="5" max="25" required>
+          </div>
+          <div class="form-group">
+            <label for="new-parent">Parent/Guardian Name</label>
+            <input type="text" id="new-parent" placeholder="Enter parent/guardian name">
+          </div>
+          <div class="form-group">
+            <label for="new-phone">Contact Number</label>
+            <input type="tel" id="new-phone" placeholder="Enter contact number">
+          </div>
+          <div class="form-group">
+            <label for="new-fee-amount">Monthly Fee Amount</label>
+            <input type="number" id="new-fee-amount" placeholder="Enter monthly fee amount" value="5000">
+          </div>
+          <button onclick="addStudent()"><i class="fas fa-save"></i> Add Student</button>
+          <div id="add-student-status" class="alert hidden"></div>
+          
+          <div id="new-student-result" class="hidden">
+            <h4 style="margin-top: 20px;"><i class="fas fa-id-card"></i> Student ID Card</h4>
+            <div class="card" style="max-width: 400px; margin-top: 15px; text-align: center;" id="print-section">
+              <div id="new-id-display"></div>
+              <div style="margin-top: 15px;">
+                <button onclick="printStudentCard()" class="btn-success no-print"><i class="fas fa-print"></i> Print ID</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Student List Tab -->
+      <div id="student-list-tab" class="tab-content">
+        <div class="card">
+          <h3><i class="fas fa-users"></i> All Students</h3>
+          <div class="form-group" style="max-width: 300px;">
+            <input type="text" id="search-student" placeholder="Search students..." oninput="searchStudents()">
+          </div>
+          <div id="loading-students" class="spinner hidden"></div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Grade</th>
+                  <th>Age</th>
+                  <th>Today's Attendance</th>
+                  <th>This Month's Fee</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="student-table-body"></tbody>
+            </table>
+          </div>
+          <div id="no-students" class="alert" style="display: none;">No students found</div>
+        </div>
+      </div>
 
-						</div>
-					</header>
+      <!-- Reports Tab -->
+      <div id="reports-tab" class="tab-content">
+        <div class="card">
+          <h3><i class="fas fa-chart-bar"></i> Reports</h3>
+          <div class="form-group">
+            <label for="report-month">Select Month</label>
+            <input type="month" id="report-month" onchange="generateReports()">
+          </div>
+          
+          <div id="attendance-report" class="card" style="margin-top: 20px;">
+            <h4>Attendance Summary</h4>
+            <div id="attendance-chart"></div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Student ID</th>
+                  <th>Name</th>
+                  <th>Days Present</th>
+                  <th>Days Absent</th>
+                  <th>Attendance %</th>
+                </tr>
+              </thead>
+              <tbody id="attendance-report-body"></tbody>
+            </table>
+          </div>
+          
+          <div id="fee-report" class="card" style="margin-top: 20px;">
+            <h4>Fee Collection Summary</h4>
+            <div id="fee-chart"></div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Student ID</th>
+                  <th>Name</th>
+                  <th>Fee Amount</th>
+                  <th>Status</th>
+                  <th>Payment Date</th>
+                </tr>
+              </thead>
+              <tbody id="fee-report-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-				<!-- Menu -->
-					<nav id="menu">
-						<h2>Menu</h2>
-						<ul>
-							<li><a href="index.html">Home</a></li>
-							<li><a href="generic.html">Ipsum veroeros</a></li>
-							<li><a href="generic.html">Tempus etiam</a></li>
-							<li><a href="generic.html">Consequat dolor</a></li>
-							<li><a href="elements.html">Elements</a></li>
-						</ul>
-					</nav>
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyACAGNLHb-w9KQgz7drE6e56lX8e_O8Yrc",
+      authDomain: "infinitylab-3a143.firebaseapp.com",
+      projectId: "infinitylab-3a143",
+      storageBucket: "infinitylab-3a143.appspot.com",
+      messagingSenderId: "689734963534",
+      appId: "1:689734963534:web:155ffce1ea3e9bd0b5ce1f",
+      measurementId: "G-EX05CM9KSY"
+    };
 
-				<!-- Main -->
-					<div id="main">
-						<div class="inner">
-							<h1>Elements</h1>
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    
+    // Global variables
+    let currentStudent = null;
+    let scanner = null;
+    let allStudents = [];
+    let currentMonth = new Date().toISOString().slice(0, 7);
 
-							<!-- Text -->
-								<section>
-									<h2>Text</h2>
-									<p>This is <b>bold</b> and this is <strong>strong</strong>. This is <i>italic</i> and this is <em>emphasized</em>.
-									This is <sup>superscript</sup> text and this is <sub>subscript</sub> text.
-									This is <u>underlined</u> and this is code: <code>for (;;) { ... }</code>. Finally, <a href="#">this is a link</a>.</p>
-									<hr />
-									<p>Nunc lacinia ante nunc ac lobortis. Interdum adipiscing gravida odio porttitor sem non mi integer non faucibus ornare mi ut ante amet placerat aliquet. Volutpat eu sed ante lacinia sapien lorem accumsan varius montes viverra nibh in adipiscing blandit tempus accumsan.</p>
-									<hr />
-									<h2>Heading Level 2</h2>
-									<h3>Heading Level 3</h3>
-									<h4>Heading Level 4</h4>
-									<hr />
-									<h3>Blockquote</h3>
-									<blockquote>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan faucibus. Vestibulum ante ipsum primis in faucibus lorem ipsum dolor sit amet nullam adipiscing eu felis.</blockquote>
-									<h3>Preformatted</h3>
-									<pre><code>i = 0;
+    // DOM Content Loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if user is already logged in
+      const user = localStorage.getItem('user');
+      if (user) {
+        showDashboard();
+      }
 
-while (!deck.isInOrder()) {
-    print 'Iteration ' + i;
-    deck.shuffle();
-    i++;
-}
+      // Set current month for reports
+      document.getElementById('report-month').value = currentMonth;
+    });
 
-print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
-								</section>
+    // Login function
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const loginStatus = document.getElementById('login-status');
+      
+      loginStatus.classList.add('hidden');
+      
+      if (!email || !password) {
+        showAlert(loginStatus, 'Please enter both email and password', 'danger');
+        return;
+      }
+      
+      try {
+        // For demo purposes, we'll use simple check
+        // In production, use Firebase Authentication
+        if (email === 'teacher@school.com' && password === 'SecurePass123') {
+          localStorage.setItem('user', JSON.stringify({ email }));
+          showDashboard();
+        } else {
+          showAlert(loginStatus, 'Invalid credentials. Please try again.', 'danger');
+        }
+      } catch (error) {
+        showAlert(loginStatus, `Login failed: ${error.message}`, 'danger');
+      }
+    }
 
-							<!-- Lists -->
-								<section>
-									<h2>Lists</h2>
-									<div class="row">
-										<div class="6u 12u$(medium)">
-											<h3>Unordered</h3>
-											<ul>
-												<li>Dolor pulvinar etiam.</li>
-												<li>Sagittis adipiscing.</li>
-												<li>Felis enim feugiat.</li>
-											</ul>
-											<h3>Alternate</h3>
-											<ul class="alt">
-												<li>Dolor pulvinar etiam.</li>
-												<li>Sagittis adipiscing.</li>
-												<li>Felis enim feugiat.</li>
-											</ul>
-										</div>
-										<div class="6u$ 12u$(medium)">
-											<h3>Ordered</h3>
-											<ol>
-												<li>Dolor pulvinar etiam.</li>
-												<li>Etiam vel felis viverra.</li>
-												<li>Felis enim feugiat.</li>
-												<li>Dolor pulvinar etiam.</li>
-												<li>Etiam vel felis lorem.</li>
-												<li>Felis enim et feugiat.</li>
-											</ol>
-											<h3>Icons</h3>
-											<ul class="icons">
-												<li><a href="#" class="icon style1 fa-twitter"><span class="label">Twitter</span></a></li>
-												<li><a href="#" class="icon style1 fa-facebook"><span class="label">Facebook</span></a></li>
-												<li><a href="#" class="icon style1 fa-instagram"><span class="label">Instagram</span></a></li>
-												<li><a href="#" class="icon style1 fa-github"><span class="label">Github</span></a></li>
-											</ul>
-											<ul class="icons">
-												<li><a href="#" class="icon style2 fa-twitter"><span class="label">Twitter</span></a></li>
-												<li><a href="#" class="icon style2 fa-facebook"><span class="label">Facebook</span></a></li>
-												<li><a href="#" class="icon style2 fa-instagram"><span class="label">Instagram</span></a></li>
-												<li><a href="#" class="icon style2 fa-github"><span class="label">Github</span></a></li>
-											</ul>
-										</div>
-									</div>
-									<h2>Actions</h2>
-									<div class="row">
-										<div class="6u 12u$(medium)">
-											<ul class="actions">
-												<li><a href="#" class="button special">Default</a></li>
-												<li><a href="#" class="button">Default</a></li>
-											</ul>
-											<ul class="actions small">
-												<li><a href="#" class="button special small">Small</a></li>
-												<li><a href="#" class="button small">Small</a></li>
-											</ul>
-											<ul class="actions vertical">
-												<li><a href="#" class="button special">Default</a></li>
-												<li><a href="#" class="button">Default</a></li>
-											</ul>
-											<ul class="actions vertical small">
-												<li><a href="#" class="button special small">Small</a></li>
-												<li><a href="#" class="button small">Small</a></li>
-											</ul>
-										</div>
-										<div class="6u 12u$(medium)">
-											<ul class="actions vertical">
-												<li><a href="#" class="button special fit">Default</a></li>
-												<li><a href="#" class="button fit">Default</a></li>
-											</ul>
-											<ul class="actions vertical small">
-												<li><a href="#" class="button special small fit">Small</a></li>
-												<li><a href="#" class="button small fit">Small</a></li>
-											</ul>
-										</div>
-									</div>
-								</section>
+    // Show dashboard
+    function showDashboard() {
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      startScanner();
+      loadAllStudents();
+    }
 
-							<!-- Table -->
-								<section>
-									<h2>Table</h2>
-									<h3>Default</h3>
-									<div class="table-wrapper">
-										<table>
-											<thead>
-												<tr>
-													<th>Name</th>
-													<th>Description</th>
-													<th>Price</th>
-												</tr>
-											</thead>
-											<tbody>
-												<tr>
-													<td>Item One</td>
-													<td>Ante turpis integer aliquet porttitor.</td>
-													<td>29.99</td>
-												</tr>
-												<tr>
-													<td>Item Two</td>
-													<td>Vis ac commodo adipiscing arcu aliquet.</td>
-													<td>19.99</td>
-												</tr>
-												<tr>
-													<td>Item Three</td>
-													<td> Morbi faucibus arcu accumsan lorem.</td>
-													<td>29.99</td>
-												</tr>
-												<tr>
-													<td>Item Four</td>
-													<td>Vitae integer tempus condimentum.</td>
-													<td>19.99</td>
-												</tr>
-												<tr>
-													<td>Item Five</td>
-													<td>Ante turpis integer aliquet porttitor.</td>
-													<td>29.99</td>
-												</tr>
-											</tbody>
-											<tfoot>
-												<tr>
-													<td colspan="2"></td>
-													<td>100.00</td>
-												</tr>
-											</tfoot>
-										</table>
-									</div>
+    // Start QR scanner
+    function startScanner() {
+      const readerElement = document.getElementById('reader');
+      const scanStatus = document.getElementById('scan-status');
+      
+      // Clear previous scanner if exists
+      if (scanner) {
+        scanner.stop().then(() => {
+          console.log("Scanner stopped successfully");
+        }).catch(err => {
+          console.log("Scanner stop error:", err);
+        });
+      }
+      
+      // Initialize new scanner
+      scanner = new Html5Qrcode("reader");
+      
+      Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+          const cameraId = devices[0].id;
+          
+          scanner.start(
+            cameraId,
+            {
+              fps: 10,
+              qrbox: { width: 250, height: 250 },
+              rememberLastUsedCamera: true
+            },
+            onScanSuccess,
+            onScanError
+          ).catch(err => {
+            showAlert(scanStatus, `Scanner error: ${err}`, 'danger');
+          });
+        } else {
+          showAlert(scanStatus, 'No cameras found. Please check your device permissions.', 'danger');
+        }
+      }).catch(err => {
+        showAlert(scanStatus, `Camera error: ${err}`, 'danger');
+      });
+    }
 
-									<h3>Alternate</h3>
-									<div class="table-wrapper">
-										<table class="alt">
-											<thead>
-												<tr>
-													<th>Name</th>
-													<th>Description</th>
-													<th>Price</th>
-												</tr>
-											</thead>
-											<tbody>
-												<tr>
-													<td>Item One</td>
-													<td>Ante turpis integer aliquet porttitor.</td>
-													<td>29.99</td>
-												</tr>
-												<tr>
-													<td>Item Two</td>
-													<td>Vis ac commodo adipiscing arcu aliquet.</td>
-													<td>19.99</td>
-												</tr>
-												<tr>
-													<td>Item Three</td>
-													<td> Morbi faucibus arcu accumsan lorem.</td>
-													<td>29.99</td>
-												</tr>
-												<tr>
-													<td>Item Four</td>
-													<td>Vitae integer tempus condimentum.</td>
-													<td>19.99</td>
-												</tr>
-												<tr>
-													<td>Item Five</td>
-													<td>Ante turpis integer aliquet porttitor.</td>
-													<td>29.99</td>
-												</tr>
-											</tbody>
-											<tfoot>
-												<tr>
-													<td colspan="2"></td>
-													<td>100.00</td>
-												</tr>
-											</tfoot>
-										</table>
-									</div>
-								</section>
+    // QR scan success handler
+    async function onScanSuccess(decodedText) {
+      try {
+        const doc = await db.collection("students").doc(decodedText).get();
+        
+        if (doc.exists) {
+          currentStudent = decodedText;
+          const data = doc.data();
+          const today = new Date().toISOString().split("T")[0];
+          const month = today.slice(0, 7);
+          
+          document.getElementById("student-info").classList.remove("hidden");
+          document.getElementById("s-id").textContent = decodedText;
+          document.getElementById("s-name").textContent = data.name;
+          document.getElementById("s-grade").textContent = data.grade;
+          
+          // Set attendance status
+          const attendanceElement = document.getElementById("s-attendance");
+          attendanceElement.textContent = data.attendance?.[today] ? "Present" : "Absent";
+          attendanceElement.className = data.attendance?.[today] ? "status-badge status-present" : "status-badge status-absent";
+          
+          // Set fee status
+          const feeElement = document.getElementById("s-fee");
+          const feeStatus = data.fees?.[month] ? "Paid" : "Unpaid";
+          feeElement.textContent = feeStatus;
+          feeElement.className = feeStatus === "Paid" ? "status-badge status-paid" : "status-badge status-unpaid";
+          
+          // Update button states
+          document.getElementById("attendance-btn").disabled = !!data.attendance?.[today];
+          document.getElementById("fee-btn").innerHTML = data.fees?.[month] ? 
+            '<i class="fas fa-times-circle"></i> Mark as Unpaid' : 
+            '<i class="fas fa-check-circle"></i> Mark as Paid';
+            
+          // Show success message
+          showAlert(document.getElementById('scan-status'), `Student ${data.name} loaded successfully!`, 'success');
+        } else {
+          showAlert(document.getElementById('scan-status'), "Student not found!", 'danger');
+        }
+      } catch (error) {
+        showAlert(document.getElementById('scan-status'), `Error: ${error.message}`, 'danger');
+      }
+    }
 
-							<!-- Buttons -->
-								<section>
-									<h3>Buttons</h3>
-									<ul class="actions">
-										<li><a href="#" class="button special">Special</a></li>
-										<li><a href="#" class="button">Default</a></li>
-									</ul>
-									<ul class="actions">
-										<li><a href="#" class="button big">Big</a></li>
-										<li><a href="#" class="button">Default</a></li>
-										<li><a href="#" class="button small">Small</a></li>
-									</ul>
-									<ul class="actions fit">
-										<li><a href="#" class="button special fit">Fit</a></li>
-										<li><a href="#" class="button fit">Fit</a></li>
-										<li><a href="#" class="button fit">Fit</a></li>
-									</ul>
-									<ul class="actions fit small">
-										<li><a href="#" class="button special fit small">Fit + Small</a></li>
-										<li><a href="#" class="button fit small">Fit + Small</a></li>
-										<li><a href="#" class="button fit small">Fit + Small</a></li>
-									</ul>
-									<ul class="actions">
-										<li><a href="#" class="button special icon fa-download">Icon</a></li>
-										<li><a href="#" class="button icon fa-upload">Icon</a></li>
-										<li><a href="#" class="button icon fa-save">Icon</a></li>
-									</ul>
-									<ul class="actions">
-										<li><span class="button special disabled">Disabled</span></li>
-										<li><span class="button disabled">Disabled</span></li>
-									</ul>
-								</section>
+    // QR scan error handler
+    function onScanError(error) {
+      console.warn(`QR error = ${error}`);
+    }
 
-							<!-- Form -->
-								<section>
-									<h2>Form</h2>
-									<form method="post" action="#">
-										<div class="row uniform">
-											<div class="6u 12u$(xsmall)">
-												<input type="text" name="demo-name" id="demo-name" value="" placeholder="Name" />
-											</div>
-											<div class="6u$ 12u$(xsmall)">
-												<input type="email" name="demo-email" id="demo-email" value="" placeholder="Email" />
-											</div>
-											<div class="12u$">
-												<div class="select-wrapper">
-													<select name="demo-category" id="demo-category">
-														<option value="">- Category -</option>
-														<option value="1">Manufacturing</option>
-														<option value="1">Shipping</option>
-														<option value="1">Administration</option>
-														<option value="1">Human Resources</option>
-													</select>
-												</div>
-											</div>
-											<div class="4u 12u$(small)">
-												<input type="radio" id="demo-priority-low" name="demo-priority" checked>
-												<label for="demo-priority-low">Low</label>
-											</div>
-											<div class="4u 12u$(small)">
-												<input type="radio" id="demo-priority-normal" name="demo-priority">
-												<label for="demo-priority-normal">Normal</label>
-											</div>
-											<div class="4u$ 12u$(small)">
-												<input type="radio" id="demo-priority-high" name="demo-priority">
-												<label for="demo-priority-high">High</label>
-											</div>
-											<div class="6u 12u$(small)">
-												<input type="checkbox" id="demo-copy" name="demo-copy">
-												<label for="demo-copy">Email me a copy</label>
-											</div>
-											<div class="6u$ 12u$(small)">
-												<input type="checkbox" id="demo-human" name="demo-human" checked>
-												<label for="demo-human">Not a robot</label>
-											</div>
-											<div class="12u$">
-												<textarea name="demo-message" id="demo-message" placeholder="Enter your message" rows="6"></textarea>
-											</div>
-											<div class="12u$">
-												<ul class="actions">
-													<li><input type="submit" value="Send Message" class="special" /></li>
-													<li><input type="reset" value="Reset" /></li>
-												</ul>
-											</div>
-										</div>
-									</form>
-								</section>
+    // Mark attendance
+    async function markAttendance() {
+      if (!currentStudent) return;
+      
+      const today = new Date().toISOString().split("T")[0];
+      const attendanceElement = document.getElementById("s-attendance");
+      const attendanceBtn = document.getElementById("attendance-btn");
+      
+      try {
+        await db.collection("students").doc(currentStudent).set({
+          attendance: { [today]: true }
+        }, { merge: true });
+        
+        attendanceElement.textContent = "Present";
+        attendanceElement.className = "status-badge status-present";
+        attendanceBtn.disabled = true;
+        showAlert(document.getElementById('scan-status'), "Attendance marked successfully!", 'success');
+        
+        // Update the student list to reflect changes
+        loadAllStudents();
+      } catch (error) {
+        showAlert(document.getElementById('scan-status'), `Failed to mark attendance: ${error.message}`, 'danger');
+      }
+    }
 
-							<!-- Image -->
-								<section>
-									<h2>Image</h2>
-									<h3>Fit</h3>
-									<div class="box alt">
-										<div class="row uniform">
-											<div class="12u$"><span class="image fit"><img src="images/pic13.jpg" alt="" /></span></div>
-											<div class="4u"><span class="image fit"><img src="images/pic01.jpg" alt="" /></span></div>
-											<div class="4u"><span class="image fit"><img src="images/pic02.jpg" alt="" /></span></div>
-											<div class="4u$"><span class="image fit"><img src="images/pic03.jpg" alt="" /></span></div>
-											<div class="4u"><span class="image fit"><img src="images/pic03.jpg" alt="" /></span></div>
-											<div class="4u"><span class="image fit"><img src="images/pic01.jpg" alt="" /></span></div>
-											<div class="4u$"><span class="image fit"><img src="images/pic02.jpg" alt="" /></span></div>
-											<div class="4u"><span class="image fit"><img src="images/pic02.jpg" alt="" /></span></div>
-											<div class="4u"><span class="image fit"><img src="images/pic03.jpg" alt="" /></span></div>
-											<div class="4u$"><span class="image fit"><img src="images/pic01.jpg" alt="" /></span></div>
-										</div>
-									</div>
-									<h3>Left &amp; Right</h3>
-									<p><span class="image left"><img src="images/pic14.jpg" alt="" /></span>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent.</p>
-									<p><span class="image right"><img src="images/pic15.jpg" alt="" /></span>Fringilla nisl. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Donec accumsan interdum nisi, quis tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent tincidunt felis sagittis eget. tempus euismod. Vestibulum ante ipsum primis in faucibus vestibulum. Blandit adipiscing eu felis iaculis volutpat ac adipiscing accumsan eu faucibus. Integer ac pellentesque praesent.</p>
-								</section>
+    // Toggle fee status
+    async function toggleFee() {
+      if (!currentStudent) return;
+      
+      const month = new Date().toISOString().slice(0, 7);
+      const feeElement = document.getElementById("s-fee");
+      const feeBtn = document.getElementById("fee-btn");
+      const feeAmount = document.getElementById("new-fee-amount").value || 5000;
+      
+      try {
+        const docRef = db.collection("students").doc(currentStudent);
+        const doc = await docRef.get();
+        const fees = doc.data().fees || {};
+        const newStatus = !fees[month];
+        
+        // Update fee status with payment date and amount
+        fees[month] = newStatus ? {
+          status: true,
+          amount: feeAmount,
+          date: new Date().toISOString()
+        } : false;
+        
+        await docRef.update({ fees });
+        
+        const feeStatus = newStatus ? "Paid" : "Unpaid";
+        feeElement.textContent = feeStatus;
+        feeElement.className = feeStatus === "Paid" ? "status-badge status-paid" : "status-badge status-unpaid";
+        feeBtn.innerHTML = newStatus ? 
+          '<i class="fas fa-times-circle"></i> Mark as Unpaid' : 
+          '<i class="fas fa-check-circle"></i> Mark as Paid';
+          
+        showAlert(document.getElementById('scan-status'), `Fee status updated to ${feeStatus}`, 'success');
+        
+        // Update the student list to reflect changes
+        loadAllStudents();
+      } catch (error) {
+        showAlert(document.getElementById('scan-status'), `Failed to update fee status: ${error.message}`, 'danger');
+      }
+    }
 
-						</div>
-					</div>
+    // Generate student ID
+    function generateID(name, grade) {
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      return `STU-${grade.toUpperCase().replace(/\s+/g, '')}-${randomNum}`;
+    }
 
-				<!-- Footer -->
-					<footer id="footer">
-						<div class="inner">
-							<section>
-								<h2>Get in touch</h2>
-								<form method="post" action="#">
-									<div class="field half first">
-										<input type="text" name="name" id="name" placeholder="Name" />
-									</div>
-									<div class="field half">
-										<input type="email" name="email" id="email" placeholder="Email" />
-									</div>
-									<div class="field">
-										<textarea name="message" id="message" placeholder="Message"></textarea>
-									</div>
-									<ul class="actions">
-										<li><input type="submit" value="Send" class="special" /></li>
-									</ul>
-								</form>
-							</section>
-							<section>
-								<h2>Follow</h2>
-								<ul class="icons">
-									<li><a href="#" class="icon style2 fa-twitter"><span class="label">Twitter</span></a></li>
-									<li><a href="#" class="icon style2 fa-facebook"><span class="label">Facebook</span></a></li>
-									<li><a href="#" class="icon style2 fa-instagram"><span class="label">Instagram</span></a></li>
-									<li><a href="#" class="icon style2 fa-dribbble"><span class="label">Dribbble</span></a></li>
-									<li><a href="#" class="icon style2 fa-github"><span class="label">GitHub</span></a></li>
-									<li><a href="#" class="icon style2 fa-500px"><span class="label">500px</span></a></li>
-									<li><a href="#" class="icon style2 fa-phone"><span class="label">Phone</span></a></li>
-									<li><a href="#" class="icon style2 fa-envelope-o"><span class="label">Email</span></a></li>
-								</ul>
-							</section>
-							<ul class="copyright">
-								<li>&copy; Untitled. All rights reserved</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
-							</ul>
-						</div>
-					</footer>
+    // Add new student
+    async function addStudent() {
+      const name = document.getElementById("new-name").value.trim();
+      const grade = document.getElementById("new-grade").value.trim();
+      const age = document.getElementById("new-age").value;
+      const parent = document.getElementById("new-parent").value.trim();
+      const phone = document.getElementById("new-phone").value.trim();
+      const feeAmount = document.getElementById("new-fee-amount").value || 5000;
+      const statusElement = document.getElementById("add-student-status");
+      
+      if (!name || !grade || !age) {
+        showAlert(statusElement, "Please fill in all required fields", 'danger');
+        return;
+      }
+      
+      const id = generateID(name, grade);
+      
+      try {
+        await db.collection("students").doc(id).set({
+          name,
+          grade,
+          age: parseInt(age),
+          parent,
+          phone,
+          feeAmount: parseFloat(feeAmount),
+          attendance: {},
+          fees: {},
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Show success message and generated ID
+        document.getElementById("new-student-result").classList.remove("hidden");
+        document.getElementById("new-id-display").innerHTML = `
+          <h4>${name}</h4>
+          <p>Grade: ${grade} | Age: ${age}</p>
+          <p><strong>Student ID:</strong> ${id}</p>
+          <img src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${id}' alt='QR Code' style="margin: 10px 0;">
+          ${parent ? `<p>Parent: ${parent}</p>` : ''}
+          ${phone ? `<p>Contact: ${phone}</p>` : ''}
+          <p>Monthly Fee: ₹${feeAmount}</p>
+        `;
+        
+        showAlert(statusElement, "Student added successfully!", 'success');
+        loadAllStudents();
+        
+        // Clear form
+        document.getElementById("new-name").value = "";
+        document.getElementById("new-grade").value = "";
+        document.getElementById("new-age").value = "";
+        document.getElementById("new-parent").value = "";
+        document.getElementById("new-phone").value = "";
+      } catch (error) {
+        showAlert(statusElement, `Failed to add student: ${error.message}`, 'danger');
+      }
+    }
 
-			</div>
+    // Load all students
+    async function loadAllStudents() {
+      const loadingElement = document.getElementById("loading-students");
+      const tableBody = document.getElementById("student-table-body");
+      const noStudentsElement = document.getElementById("no-students");
+      
+      loadingElement.classList.remove("hidden");
+      tableBody.innerHTML = "";
+      noStudentsElement.style.display = "none";
+      
+      try {
+        const querySnapshot = await db.collection("students").orderBy("createdAt", "desc").get();
+        allStudents = [];
+        
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          const today = new Date().toISOString().split("T")[0];
+          const month = today.slice(0, 7);
+          
+          allStudents.push({
+            id: doc.id,
+            ...data
+          });
+        });
+        
+        renderStudentTable(allStudents);
+        
+        if (allStudents.length === 0) {
+          noStudentsElement.style.display = "block";
+        }
+      } catch (error) {
+        showAlert(document.getElementById('scan-status'), `Failed to load students: ${error.message}`, 'danger');
+      } finally {
+        loadingElement.classList.add("hidden");
+      }
+    }
 
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/skel.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
-			<script src="assets/js/main.js"></script>
+    // Render student table
+    function renderStudentTable(students) {
+      const tableBody = document.getElementById("student-table-body");
+      const today = new Date().toISOString().split("T")[0];
+      const month = today.slice(0, 7);
+      
+      tableBody.innerHTML = students.map(student => {
+        const attendanceStatus = student.attendance?.[today] ? 
+          '<span class="status-badge status-present">Present</span>' : 
+          '<span class="status-badge status-absent">Absent</span>';
+        
+        const feeStatus = student.fees?.[month] ? 
+          '<span class="status-badge status-paid">Paid</span>' : 
+          '<span class="status-badge status-unpaid">Unpaid</span>';
+        
+        return `
+          <tr>
+            <td>${student.id}</td>
+            <td>${student.name}</td>
+            <td>${student.grade}</td>
+            <td>${student.age || '-'}</td>
+            <td>${attendanceStatus}</td>
+            <td>${feeStatus}</td>
+            <td>
+              <button onclick="viewStudent('${student.id}')" class="btn-success" style="padding: 5px 8px;">
+                <i class="fas fa-eye"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
 
-	</body>
+    // Search students
+    function searchStudents() {
+      const searchTerm = document.getElementById("search-student").value.toLowerCase();
+      
+      if (!searchTerm) {
+        renderStudentTable(allStudents);
+        return;
+      }
+      
+      const filteredStudents = allStudents.filter(student => 
+        student.name.toLowerCase().includes(searchTerm) || 
+        student.grade.toLowerCase().includes(searchTerm) ||
+        student.id.toLowerCase().includes(searchTerm)
+      );
+      
+      renderStudentTable(filteredStudents);
+      document.getElementById("no-students").style.display = filteredStudents.length === 0 ? "block" : "none";
+    }
+
+    // View student details
+    function viewStudent(studentId) {
+      // Switch to scanner tab
+      switchTab('scanner-tab');
+      
+      // Simulate scanning the student ID
+      onScanSuccess(studentId);
+      
+      // Scroll to student info section
+      document.getElementById("student-info").scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // View student history
+    async function viewStudentHistory() {
+      if (!currentStudent) return;
+      
+      try {
+        const doc = await db.collection("students").doc(currentStudent).get();
+        if (!doc.exists) return;
+        
+        const data = doc.data();
+        const today = new Date().toISOString().split("T")[0];
+        const currentMonth = today.slice(0, 7);
+        
+        // Generate attendance history
+        let attendanceHistory = "<h4>Attendance History</h4><ul>";
+        let presentDays = 0;
+        let totalDays = 0;
+        
+        for (const date in data.attendance) {
+          attendanceHistory += `<li>${formatDate(date)}: ${data.attendance[date] ? 'Present' : 'Absent'}</li>`;
+          if (date.startsWith(currentMonth)) {
+            totalDays++;
+            if (data.attendance[date]) presentDays++;
+          }
+        }
+        
+        attendanceHistory += "</ul>";
+        
+        // Generate fee history
+        let feeHistory = "<h4>Fee Payment History</h4><ul>";
+        
+        for (const month in data.fees) {
+          if (data.fees[month]) {
+            feeHistory += `<li>${formatMonth(month)}: Paid (₹${data.fees[month].amount || 'N/A'}) on ${formatDate(data.fees[month].date)}</li>`;
+          }
+        }
+        
+        feeHistory += "</ul>";
+        
+        // Calculate attendance percentage
+        const attendancePercentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+        
+        // Show modal with history
+        alert(`
+          Student: ${data.name} (${currentStudent})
+          ${attendanceHistory}
+          <strong>This Month's Attendance:</strong> ${presentDays}/${totalDays} days (${attendancePercentage}%)
+          ${feeHistory}
+        `);
+      } catch (error) {
+        showAlert(document.getElementById('scan-status'), `Failed to load history: ${error.message}`, 'danger');
+      }
+    }
+
+    // Format date for display
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        weekday: 'short'
+      });
+    }
+
+    // Format month for display
+    function formatMonth(monthString) {
+      const [year, month] = monthString.split('-');
+      const date = new Date(year, month - 1);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long'
+      });
+    }
+
+    // Print student card
+    function printStudentCard() {
+      const printContent = document.getElementById('print-section').innerHTML;
+      const originalContent = document.body.innerHTML;
+      
+      document.body.innerHTML = `
+        <div style="padding: 20px; text-align: center;">
+          ${printContent}
+          <p style="margin-top: 20px; font-size: 12px; color: #666;">
+            Generated on ${new Date().toLocaleDateString()}
+          </p>
+        </div>
+      `;
+      
+      window.print();
+      document.body.innerHTML = originalContent;
+      window.location.reload();
+    }
+
+    // Generate reports
+    async function generateReports() {
+      const month = document.getElementById('report-month').value;
+      if (!month) return;
+      
+      try {
+        // Get all students
+        const querySnapshot = await db.collection("students").get();
+        const students = [];
+        
+        querySnapshot.forEach(doc => {
+          students.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+        
+        // Generate attendance report
+        const attendanceReportBody = document.getElementById('attendance-report-body');
+        let attendanceHTML = '';
+        let totalPresent = 0;
+        let totalStudents = students.length;
+        
+        students.forEach(student => {
+          let presentDays = 0;
+          let totalDays = 0;
+          
+          for (const date in student.attendance) {
+            if (date.startsWith(month)) {
+              totalDays++;
+              if (student.attendance[date]) presentDays++;
+            }
+          }
+          
+          const attendancePercentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+          if (presentDays > 0) totalPresent++;
+          
+          attendanceHTML += `
+            <tr>
+              <td>${student.id}</td>
+              <td>${student.name}</td>
+              <td>${presentDays}</td>
+              <td>${totalDays - presentDays}</td>
+              <td>${attendancePercentage}%</td>
+            </tr>
+          `;
+        });
+        
+        attendanceReportBody.innerHTML = attendanceHTML;
+        
+        // Generate fee report
+        const feeReportBody = document.getElementById('fee-report-body');
+        let feeHTML = '';
+        let totalPaid = 0;
+        let totalAmount = 0;
+        
+        students.forEach(student => {
+          const feeStatus = student.fees?.[month];
+          const feeAmount = student.feeAmount || 5000;
+          
+          if (feeStatus) {
+            totalPaid++;
+            totalAmount += feeAmount;
+          }
+          
+          feeHTML += `
+            <tr>
+              <td>${student.id}</td>
+              <td>${student.name}</td>
+              <td>₹${feeAmount}</td>
+              <td>${feeStatus ? '<span class="status-badge status-paid">Paid</span>' : '<span class="status-badge status-unpaid">Unpaid</span>'}</td>
+              <td>${feeStatus ? formatDate(feeStatus.date) : '-'}</td>
+            </tr>
+          `;
+        });
+        
+        feeReportBody.innerHTML = feeHTML;
+        
+        // Update report headers with summary
+        document.querySelector('#attendance-report h4').textContent = 
+          `Attendance Summary for ${formatMonth(month)} (${totalPresent}/${totalStudents} students present)`;
+        
+        document.querySelector('#fee-report h4').textContent = 
+          `Fee Collection Summary for ${formatMonth(month)} (₹${totalAmount} collected from ${totalPaid}/${totalStudents} students)`;
+          
+      } catch (error) {
+        console.error("Error generating reports:", error);
+        alert("Failed to generate reports: " + error.message);
+      }
+    }
+
+    // Switch between tabs
+    function switchTab(tabId) {
+      if (tabId === 'logout') {
+        logout();
+        return;
+      }
+      
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Deactivate all tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Activate selected tab
+      document.getElementById(tabId).classList.add('active');
+      
+      // Activate tab button
+      event.currentTarget.classList.add('active');
+      
+      // Special handling for scanner tab
+      if (tabId === 'scanner-tab') {
+        startScanner();
+      }
+      
+      // Special handling for reports tab
+      if (tabId === 'reports-tab') {
+        generateReports();
+      }
+    }
+
+    // Show alert message
+    function showAlert(element, message, type) {
+      element.textContent = message;
+      element.className = `alert alert-${type}`;
+      element.classList.remove('hidden');
+      
+      // Hide alert after 5 seconds
+      setTimeout(() => {
+        element.classList.add('hidden');
+      }, 5000);
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('user');
+      window.location.reload();
+    }
+  </script>
+</body>
 </html>
