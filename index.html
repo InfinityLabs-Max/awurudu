@@ -3,639 +3,706 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Avurudu 2025 - Greeting Card & Nakath Countdown</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Sinhala:wght@400;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <title>Smart Student Manager</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a0ca3;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --radius: 8px;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
-      overflow-x: hidden;
+      line-height: 1.6;
+      background-color: #f5f7fa;
+      color: var(--dark);
+      padding: 20px;
     }
-    .sinhala-text {
-      font-family: 'Noto Sans Sinhala', sans-serif;
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
     }
-    .festive-border {
-      border-image: linear-gradient(45deg, #d97706, #f59e0b, #fbbf24, #f59e0b, #d97706) 1;
+    
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 25px;
+      margin-bottom: 25px;
     }
-    .card-shadow {
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    .hidden { display: none; }
+    
+    h1, h2, h3 {
+      color: var(--primary-dark);
+      margin-bottom: 20px;
     }
-    .countdown-bg {
-      background: linear-gradient(135deg, #4c1d95, #7c3aed);
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #d97706, #f59e0b);
-      transition: all 0.3s ease;
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .btn-secondary {
-      background: linear-gradient(135deg, #1e40af, #3b82f6);
-      transition: all 0.3s ease;
-    }
-    .btn-secondary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .btn-tertiary {
-      background: linear-gradient(135deg, #10b981, #34d399);
-      transition: all 0.3s ease;
-    }
-    .btn-tertiary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .music-control {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 100;
-    }
-    .share-buttons {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .share-btn {
-      padding: 8px 12px;
-      border-radius: 4px;
+    
+    .btn {
+      background-color: var(--primary);
       color: white;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius);
       cursor: pointer;
-      transition: all 0.2s ease;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
-    .share-btn:hover {
+    
+    .btn:hover {
+      background-color: var(--primary-dark);
       transform: translateY(-2px);
     }
-    .whatsapp-btn {
-      background-color: #25D366;
+    
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 13px;
     }
-    .facebook-btn {
-      background-color: #3b5998;
+    
+    .btn-success { background-color: var(--success); }
+    .btn-danger { background-color: var(--danger); }
+    .btn-warning { background-color: var(--warning); }
+    
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: var(--radius);
+      font-size: 15px;
     }
-    .ritual-item {
-      transition: all 0.3s ease;
+    
+    .form-group { margin-bottom: 20px; }
+    
+    .alert {
+      padding: 12px 15px;
+      border-radius: var(--radius);
+      margin: 15px 0;
     }
-    .ritual-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
     }
-    .optional-text {
-      color: #6b7280;
-      font-style: italic;
+    
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
     }
-    .firework {
-      position: absolute;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 1000;
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
     }
-    @keyframes firework {
-      0% { transform: translate(var(--x), var(--y)); opacity: 1; }
-      100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
+    
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .badge-success { background-color: #d4edda; color: #155724; }
+    .badge-danger { background-color: #f8d7da; color: #721c24; }
+    .badge-warning { background-color: #fff3cd; color: #856404; }
+    .badge-info { background-color: #d1ecf1; color: #0c5460; }
+    
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto;
+      border: 2px dashed #ccc;
+      border-radius: var(--radius);
+      padding: 15px;
+    }
+    
+    .student-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 25px 0;
+    }
+    
+    .info-card {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: var(--radius);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 25px;
+      width: 90%;
+      max-width: 500px;
+      border-radius: var(--radius);
+    }
+    
+    .close-modal {
+      float: right;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    
+    .tab {
+      padding: 12px 25px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom: 3px solid var(--primary);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    @media (max-width: 768px) {
+      .container { padding: 10px; }
+      .student-info { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-<body class="min-h-screen py-8 px-4" onload="startMusic()">
-  <!-- Audio Element -->
-  <audio id="backgroundMusic" loop>
-    <source src="https://github.com/InfinityLabs-Max/awurudu/raw/refs/heads/master/Sirilaka%20Piri%20Aurudu%20Siri%20-%20Sinhala%20Aluth%20Aurudu%20Song%20Karoke%20Without%20Voice.mp3" type="audio/mpeg">
-  </audio>
-  
-  <!-- Music Control -->
-  <div class="music-control">
-    <button onclick="toggleMusic()" class="bg-white p-3 rounded-full shadow-lg hover:bg-gray-100">
-      <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    </button>
+<body>
+  <div class="container">
+    <!-- Login Section -->
+    <div id="login" class="card">
+      <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
+      <div class="form-group">
+        <input type="email" id="email" placeholder="Your Email" required>
+      </div>
+      <div class="form-group">
+        <input type="password" id="password" placeholder="Password" required>
+      </div>
+      <button class="btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> Login</button>
+      <div id="login-status" class="alert hidden"></div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden">
+      <h1><i class="fas fa-user-graduate"></i> Student Management System</h1>
+      
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('scanner')"><i class="fas fa-qrcode"></i> Scanner</div>
+        <div class="tab" onclick="switchTab('add-student')"><i class="fas fa-user-plus"></i> Add Student</div>
+        <div class="tab" onclick="switchTab('students')"><i class="fas fa-users"></i> Students</div>
+      </div>
+      
+      <!-- Scanner Tab -->
+      <div id="scanner" class="tab-content active">
+        <div class="card">
+          <h3><i class="fas fa-qrcode"></i> QR Code Scanner</h3>
+          <div id="reader"></div>
+          <div id="scan-status" class="alert hidden"></div>
+        </div>
+
+        <div id="student-info" class="card hidden">
+          <h3><i class="fas fa-user-circle"></i> Student Details</h3>
+          <div class="student-info">
+            <div class="info-card">
+              <div class="info-label">Student ID</div>
+              <div class="info-value" id="s-id">-</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Name</div>
+              <div class="info-value" id="s-name">-</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Grade</div>
+              <div class="info-value" id="s-grade">-</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Today's Attendance</div>
+              <div class="info-value"><span id="s-attendance" class="badge">-</span></div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Fee Status</div>
+              <div class="info-value"><span id="s-fee" class="badge">-</span></div>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="btn btn-success" onclick="viewHistory()"><i class="fas fa-history"></i> View History</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Add Student Tab -->
+      <div id="add-student" class="tab-content">
+        <div class="card">
+          <h3><i class="fas fa-user-plus"></i> Register New Student</h3>
+          <div class="form-group">
+            <input type="text" id="new-name" placeholder="Full Name" required>
+          </div>
+          <div class="form-group">
+            <input type="text" id="new-grade" placeholder="Grade/Class" required>
+          </div>
+          <div class="form-group">
+            <input type="number" id="new-age" placeholder="Age" min="5" max="25" required>
+          </div>
+          <button class="btn" onclick="addStudent()"><i class="fas fa-save"></i> Register Student</button>
+          <div id="add-status" class="alert hidden"></div>
+          
+          <div id="student-card" class="hidden" style="margin-top: 30px;">
+            <h4><i class="fas fa-id-card"></i> Student ID Card</h4>
+            <div class="card" style="text-align: center; max-width: 400px;">
+              <div id="student-qr"></div>
+              <button class="btn btn-success" style="margin-top: 15px;" onclick="printCard()">
+                <i class="fas fa-print"></i> Print ID
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Students Tab -->
+      <div id="students" class="tab-content">
+        <div class="card">
+          <h3><i class="fas fa-users"></i> Student Records</h3>
+          <div class="form-group" style="max-width: 300px;">
+            <input type="text" id="search" placeholder="Search students..." oninput="searchStudents()">
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Grade</th>
+                  <th>Attendance</th>
+                  <th>Fees</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="students-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="max-w-4xl mx-auto">
-    <!-- Header Section -->
-    <header class="text-center mb-10">
-      <div class="inline-block mb-4">
-        <div class="flex items-center justify-center space-x-2">
-          <img src="https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png" alt="Avurudu" class="h-12 w-12">
-          <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-yellow-500">
-            Sinhala & Tamil New Year 2025
-          </h1>
-          <img src="https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png" alt="Avurudu" class="h-12 w-12">
-        </div>
-        <div class="h-1 mt-2 bg-gradient-to-r from-red-500 via-yellow-500 to-red-500 rounded-full"></div>
+  <!-- Payment Modal -->
+  <div id="payment-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <h3><i class="fas fa-money-bill-wave"></i> Fee Payment</h3>
+      <div class="info-card" style="margin: 15px 0;">
+        <div><strong>Student:</strong> <span id="pay-name"></span></div>
+        <div><strong>Month:</strong> <span id="pay-month"></span></div>
       </div>
-      
-      <div class="countdown-bg text-white rounded-xl p-4 max-w-2xl mx-auto card-shadow">
-        <h2 class="text-xl font-semibold mb-2">Countdown to Next Nakath</h2>
-        <div id="countdown" class="text-2xl font-mono font-bold text-yellow-200"></div>
-        <div id="nakath-name" class="mt-2 text-lg font-medium"></div>
+      <div class="form-group">
+        <label>Amount ($)</label>
+        <input type="number" id="payment-amount" value="100" min="1">
       </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="grid md:grid-cols-2 gap-8">
-      <!-- Greeting Card Generator -->
-      <div class="bg-white rounded-2xl p-6 card-shadow">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create Your Greeting Card</h2>
-        
-        <div class="space-y-4">
-          <div>
-            <label for="language" class="block text-sm font-medium text-gray-700 mb-1">Language</label>
-            <select id="language" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
-              <option value="si">සිංහල (Sinhala)</option>
-              <option value="en">English</option>
-              <option value="ta">தமிழ் (Tamil)</option>
-            </select>
-          </div>
-          
-          <div>
-            <label for="nameInput" class="block text-sm font-medium text-gray-700 mb-1">Your Name <span class="optional-text">(required)</span></label>
-            <input id="nameInput" type="text" placeholder="Enter Your Name" 
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
-          </div>
-          
-          <div>
-            <label for="companyInput" class="block text-sm font-medium text-gray-700 mb-1">Company/Organization <span class="optional-text">(optional)</span></label>
-            <input id="companyInput" type="text" placeholder="Enter Company Name" 
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
-          </div>
-
-          <div>
-            <label for="optionalText" class="block text-sm font-medium text-gray-700 mb-1">Custom Message <span class="optional-text">(optional)</span></label>
-            <input id="optionalText" type="text" placeholder="Enter custom message" 
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500">
-          </div>
-          
-          <div class="flex space-x-3 pt-2">
-            <button onclick="generateCard()" 
-                    class="btn-primary text-white px-6 py-3 rounded-lg font-medium flex-1">
-              Generate Card
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Card Preview -->
-      <div class="flex flex-col">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">Your Card Preview</h3>
-        <div id="cardPreview" class="flex-1 flex items-center justify-center p-4 bg-gray-50 rounded-2xl min-h-64">
-          <p class="text-gray-400">Your greeting card will appear here</p>
-        </div>
-        <div id="shareButtons" class="share-buttons hidden">
-          <button onclick="shareOnWhatsApp()" class="share-btn whatsapp-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
-            </svg>
-            WhatsApp
-          </button>
-          <button onclick="shareOnFacebook()" class="share-btn facebook-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
-            </svg>
-            Facebook
-          </button>
-          <button onclick="downloadCard()" class="share-btn btn-tertiary">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-            Download
-          </button>
-        </div>
-      </div>
-    </main>
-
-    <!-- Nakath Times Section -->
-    <section class="mt-12 bg-white rounded-2xl p-6 card-shadow">
-      <h2 class="text-2xl font-bold text-center mb-6">Sinhala Avurudu Rituals 2025</h2>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="ritual-item bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
-          <h3 class="font-semibold text-yellow-800 sinhala-text">නව සඳ බැලීම</h3>
-          <p class="text-gray-700">Observing the New Moon</p>
-          <p class="text-gray-600">March 30 (Sun) & May 1 (Thu)</p>
-          <p class="text-sm mt-2 text-gray-700">The new moon is observed as an important transition in the Sinhala New Year calendar.</p>
-        </div>
-        <div class="ritual-item bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
-          <h3 class="font-semibold text-red-800 sinhala-text">පරණ අවුරුද්ද සඳහා ස්නානය</h3>
-          <p class="text-gray-700">Ritual Bath for the Old Year</p>
-          <p class="text-gray-600">April 13 (Sun)</p>
-          <p class="text-sm mt-2 text-gray-700">Take a herbal bath using Divul leaves juice before the old year ends.</p>
-        </div>
-        <div class="ritual-item bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-          <h3 class="font-semibold text-green-800 sinhala-text">අලුත් අවුරුදු උදාව</h3>
-          <p class="text-gray-700">Dawn of the New Year</p>
-          <p class="text-gray-600">April 14 (Mon) 3:21 AM</p>
-          <p class="text-sm mt-2 text-gray-700">Official transition from the old year to the new. Light lamps and begin rituals.</p>
-        </div>
-        <div class="ritual-item bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-          <h3 class="font-semibold text-blue-800 sinhala-text">පුණ්ය කාලය</h3>
-          <p class="text-gray-700">Neutral Period</p>
-          <p class="text-gray-600">April 13, 8:57 PM to April 14, 9:45 AM</p>
-          <p class="text-sm mt-2 text-gray-700">All work paused for religious activities. First meal prepared during auspicious time.</p>
-        </div>
-        <div class="ritual-item bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
-          <h3 class="font-semibold text-purple-800 sinhala-text">ආහර පිසීම</h3>
-          <p class="text-gray-700">First Meal Preparation</p>
-          <p class="text-gray-600">April 14, 4:04 AM</p>
-          <p class="text-sm mt-2 text-gray-700">Wear copper-colored clothes, face south, prepare kiribath and sweetmeats.</p>
-        </div>
-        <div class="ritual-item bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-500">
-          <h3 class="font-semibold text-indigo-800 sinhala-text">වැඩ ඇල්ලීම</h3>
-          <p class="text-gray-700">Starting Work & Transactions</p>
-          <p class="text-gray-600">April 14, 6:44 AM</p>
-          <p class="text-sm mt-2 text-gray-700">Wear white clothes, face south, resume work and share first meal.</p>
-        </div>
-        <div class="ritual-item bg-pink-50 p-4 rounded-lg border-l-4 border-pink-500">
-          <h3 class="font-semibold text-pink-800 sinhala-text">හිසතෙල් ගෑම</h3>
-          <p class="text-gray-700">Anointing of Oil</p>
-          <p class="text-gray-600">April 16, 9:04 AM</p>
-          <p class="text-sm mt-2 text-gray-700">Wear green clothes, face north, apply herbal oil with kohomba leaves.</p>
-        </div>
-        <div class="ritual-item bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
-          <h3 class="font-semibold text-teal-800 sinhala-text">රැකීරක්ෂා සඳහා පිටත්ව යෑම</h3>
-          <p class="text-gray-700">Stepping Out for Prosperity</p>
-          <p class="text-gray-600">April 17, 9:03 AM</p>
-          <p class="text-sm mt-2 text-gray-700">Wear gold clothes, eat kiribath, face north to begin new journeys.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="mt-12 text-center text-gray-600">
-      <div class="flex items-center justify-center space-x-2 mb-2">
-        <img src="https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png" alt="Avurudu" class="h-8 w-8">
-        <p class="text-sm">Powered by <strong class="text-yellow-600">Infinity Lab</strong></p>
-      </div>
-      <a href="https://awurudulk.vercel.app" class="text-blue-500 hover:underline text-sm">
-        awurudulk.vercel.app
-      </a>
-    </footer>
+      <button class="btn btn-success" onclick="processPayment()">
+        <i class="fas fa-check-circle"></i> Confirm Payment
+      </button>
+    </div>
   </div>
 
   <script>
-    // Background Music Control
-    const music = document.getElementById('backgroundMusic');
-    const playIcon = document.getElementById('playIcon');
-    const pauseIcon = document.getElementById('pauseIcon');
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyACAGNLHb-w9KQgz7drE6e56lX8e_O8Yrc",
+      authDomain: "infinitylab-3a143.firebaseapp.com",
+      projectId: "infinitylab-3a143",
+      storageBucket: "infinitylab-3a143.appspot.com",
+      messagingSenderId: "689734963534",
+      appId: "1:689734963534:web:155ffce1ea3e9bd0b5ce1f",
+      measurementId: "G-EX05CM9KSY"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
     
-    function startMusic() {
-      // Try to autoplay music (may be blocked by browser policies)
-      const promise = music.play();
-      if (promise !== undefined) {
-        promise.catch(error => {
-          // Auto-play was prevented, show paused state
-          playIcon.classList.remove('hidden');
-          pauseIcon.classList.add('hidden');
-        }).then(() => {
-          // Auto-play worked, show playing state
-          playIcon.classList.add('hidden');
-          pauseIcon.classList.remove('hidden');
-        });
+    // Global Variables
+    let currentStudent = null;
+    let scanner = null;
+    let allStudents = [];
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+
+    // Initialize App
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if user is already logged in
+      const user = localStorage.getItem('user');
+      if (user) {
+        showDashboard();
       }
-    }
-    
-    function toggleMusic() {
-      if (music.paused) {
-        music.play();
-        playIcon.classList.add('hidden');
-        pauseIcon.classList.remove('hidden');
-      } else {
-        music.pause();
-        playIcon.classList.remove('hidden');
-        pauseIcon.classList.add('hidden');
-      }
-    }
-    
-    // Set music volume to medium
-    music.volume = 0.5;
+    });
 
-    const nakathList = [
-      { name: "පුණ්‍ය කාලය (Punya Kalaya)", date: new Date("2025-04-13T20:57:00") },
-      { name: "අලුත් අවුරුද්ද (Aluth Avurudda)", date: new Date("2025-04-14T03:21:00") },
-      { name: "ආහාර පිසීම (Food Preparation)", date: new Date("2025-04-14T04:04:00") },
-      { name: "වැඩ ඇල්ලීම (Work Commencement)", date: new Date("2025-04-14T06:44:00") },
-      { name: "හිසතෙල් ගෑම (Anointing Oil)", date: new Date("2025-04-16T09:04:00") },
-      { name: "රැකියාව ආරම්භය (Return to Work)", date: new Date("2025-04-17T09:03:00") }
-    ];
-
-    let currentNakathIndex = 0;
-    let countdownCompleted = false;
-
-    function getNextNakath() {
-      const now = new Date();
-      const nextNakath = nakathList.find(n => n.date > now) || nakathList[nakathList.length - 1];
-      const newIndex = nakathList.indexOf(nextNakath);
+    // Login Function
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const status = document.getElementById('login-status');
       
-      if (newIndex !== currentNakathIndex) {
-        currentNakathIndex = newIndex;
-        if (!countdownCompleted) {
-          createFireworks();
-          countdownCompleted = true;
-          setTimeout(() => { countdownCompleted = false; }, 1000);
+      if (!email || !password) {
+        showAlert(status, 'Please enter both email and password', 'danger');
+        return;
+      }
+      
+      try {
+        // Demo credentials (replace with Firebase Auth in production)
+        if (email === 'admin@school.com' && password === 'Admin123') {
+          localStorage.setItem('user', JSON.stringify({ email }));
+          showDashboard();
+        } else {
+          showAlert(status, 'Invalid credentials', 'danger');
         }
-      }
-      
-      return nextNakath;
-    }
-
-    function createFireworks() {
-      // Create canvas-confetti fireworks
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#ff0000', '#ffff00', '#ff9900', '#00ff00', '#00ffff', '#9900ff']
-      });
-      
-      // Create custom firework elements
-      for (let i = 0; i < 30; i++) {
-        setTimeout(() => {
-          const firework = document.createElement('div');
-          firework.className = 'firework';
-          firework.style.backgroundColor = getRandomColor();
-          firework.style.left = `${Math.random() * 100}%`;
-          firework.style.top = `${Math.random() * 100}%`;
-          firework.style.setProperty('--x', '0px');
-          firework.style.setProperty('--y', '0px');
-          firework.style.setProperty('--tx', `${(Math.random() - 0.5) * 200}px`);
-          firework.style.setProperty('--ty', `${(Math.random() - 0.5) * 200}px`);
-          firework.style.animation = 'firework 1s forwards';
-          document.body.appendChild(firework);
-          
-          // Remove after animation
-          setTimeout(() => {
-            firework.remove();
-          }, 1000);
-        }, i * 100);
+      } catch (error) {
+        showAlert(status, `Login failed: ${error.message}`, 'danger');
       }
     }
 
-    function getRandomColor() {
-      const colors = ['#ff0000', '#ffff00', '#ff9900', '#00ff00', '#00ffff', '#9900ff'];
-      return colors[Math.floor(Math.random() * colors.length)];
+    // Show Dashboard
+    function showDashboard() {
+      document.getElementById('login').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      startScanner();
+      loadStudents();
     }
 
-    function updateCountdown() {
-      const nextNakath = getNextNakath();
-      if (!nextNakath) return;
+    // QR Scanner Functions
+    function startScanner() {
+      const reader = document.getElementById('reader');
       
-      const diff = nextNakath.date - new Date();
-      if (diff <= 0) return;
-      
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((diff / (1000 * 60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      
-      let countdownText = '';
-      if (days > 0) countdownText += `${days}d `;
-      countdownText += `${hours}h ${minutes}m ${seconds}s`;
-      
-      document.getElementById("countdown").textContent = countdownText;
-      document.getElementById("nakath-name").textContent = nextNakath.name;
-    }
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    function generateCard() {
-      const name = document.getElementById("nameInput").value.trim();
-      if (!name) {
-        alert("Please enter your name to generate the card");
-        return;
+      // Clear previous scanner if exists
+      if (scanner) {
+        scanner.stop().catch(() => {});
       }
       
-      const company = document.getElementById("companyInput").value.trim();
-      const optionalText = document.getElementById("optionalText").value.trim();
-      const lang = document.getElementById("language").value;
+      scanner = new Html5Qrcode("reader");
       
-      let message = "";
-      const companyText = company ? `<p class='mt-1 text-sm text-gray-600'>${company}</p>` : "";
-      const optionalMessage = optionalText ? `<p class='mt-2 text-sm italic text-gray-700'>${optionalText}</p>` : "";
-      const currentYear = new Date().getFullYear();
-
-      // Traditional welcome girl image
-      const welcomeGirl = "https://raw.githubusercontent.com/InfinityLabs-Max/awurudu/refs/heads/master/Sinhala-and-Tamil-New-Year-Greetings-PNG.png"; // Traditional welcome girl image
-
-      // Card design with festive elements
-      if (lang === "si") {
-        message = `
-          <div id="card" class="w-full max-w-md p-8 rounded-2xl bg-gradient-to-br from-yellow-50 to-red-50 border-4 border-yellow-400 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-red-500 rounded-full opacity-10 -mr-10 -mt-10"></div>
-            <div class="absolute bottom-0 left-0 w-32 h-32 bg-yellow-500 rounded-full opacity-10 -ml-16 -mb-16"></div>
-            
-            <div class="relative z-10 text-center">
-              <div class="flex justify-center mb-4">
-                <img src="${welcomeGirl}" alt="Traditional Welcome Girl" class="h-32">
-              </div>
-              <h3 class="text-2xl font-bold text-red-600 mb-2 sinhala-text">සුභ අලුත් අවුරුද්දක් වේවා!</h3>
-              <div class="my-4">
-                <div class="inline-block border-t-2 border-b-2 border-yellow-400 px-6 py-1">
-                  <p class="text-3xl font-bold text-gray-800">${name}</p>
-                </div>
-              </div>
-              ${companyText}
-              ${optionalMessage}
-              <div class="mt-8 text-xs text-gray-500">
-                <p class="sinhala-text">සුභ අලුත් අවුරුද්ද ${currentYear} - Infinity Lab</p>
-                <p class="mt-1"><a href="https://awurudulk.vercel.app" class="text-blue-500">awurudulk.vercel.app</a></p>
-              </div>
-            </div>
-          </div>`;
-      } else if (lang === "ta") {
-        message = `
-          <div id="card" class="w-full max-w-md p-8 rounded-2xl bg-gradient-to-br from-yellow-50 to-red-50 border-4 border-yellow-400 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-red-500 rounded-full opacity-10 -mr-10 -mt-10"></div>
-            <div class="absolute bottom-0 left-0 w-32 h-32 bg-yellow-500 rounded-full opacity-10 -ml-16 -mb-16"></div>
-            
-            <div class="relative z-10 text-center">
-              <div class="flex justify-center mb-4">
-                <img src="${welcomeGirl}" alt="Traditional Welcome Girl" class="h-32">
-              </div>
-              <h3 class="text-2xl font-bold text-red-600 mb-2">புத்தாண்டு வாழ்த்துக்கள்!</h3>
-              <div class="my-4">
-                <div class="inline-block border-t-2 border-b-2 border-yellow-400 px-6 py-1">
-                  <p class="text-3xl font-bold text-gray-800">${name}</p>
-                </div>
-              </div>
-              ${companyText}
-              ${optionalMessage}
-              <div class="mt-8 text-xs text-gray-500">
-                <p>புத்தாண்டு வாழ்த்துக்கள் ${currentYear} - Infinity Lab</p>
-                <p class="mt-1"><a href="https://awurudulk.vercel.app" class="text-blue-500">awurudulk.vercel.app</a></p>
-              </div>
-            </div>
-          </div>`;
-      } else {
-        message = `
-          <div id="card" class="w-full max-w-md p-8 rounded-2xl bg-gradient-to-br from-yellow-50 to-red-50 border-4 border-yellow-400 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-red-500 rounded-full opacity-10 -mr-10 -mt-10"></div>
-            <div class="absolute bottom-0 left-0 w-32 h-32 bg-yellow-500 rounded-full opacity-10 -ml-16 -mb-16"></div>
-            
-            <div class="relative z-10 text-center">
-              <div class="flex justify-center mb-4">
-                <img src="${welcomeGirl}" alt="Traditional Welcome Girl" class="h-32">
-              </div>
-              <h3 class="text-2xl font-bold text-red-600 mb-2">Happy Sinhala & Tamil New Year!</h3>
-              <div class="my-4">
-                <div class="inline-block border-t-2 border-b-2 border-yellow-400 px-6 py-1">
-                  <p class="text-3xl font-bold text-gray-800">${name}</p>
-                </div>
-              </div>
-              ${companyText}
-              ${optionalMessage}
-              <div class="mt-8 text-xs text-gray-500">
-                <p>Happy New Year ${currentYear} - Infinity Lab</p>
-                <p class="mt-1"><a href="https://awurudulk.vercel.app" class="text-blue-500">awurudulk.vercel.app</a></p>
-              </div>
-            </div>
-          </div>`;
-      }
-      
-      document.getElementById("cardPreview").innerHTML = message;
-      document.getElementById("shareButtons").classList.remove("hidden");
-      createFireworks(); // Add fireworks when card is generated
-    }
-
-    function downloadCard() {
-      const card = document.getElementById("card");
-      if (!card) {
-        alert("Please generate a card first before downloading");
-        return;
-      }
-      
-      // Temporarily hide the music control for the screenshot
-      const musicControl = document.querySelector('.music-control');
-      musicControl.style.visibility = 'hidden';
-      
-      html2canvas(card, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        allowTaint: true
-      }).then(canvas => {
-        const link = document.createElement("a");
-        link.download = `avurudu-greeting-${new Date().getTime()}.jpeg`;
-        link.href = canvas.toDataURL("image/jpeg", 0.9);
-        link.click();
-        
-        // Restore the music control after screenshot
-        musicControl.style.visibility = 'visible';
-        createFireworks(); // Add fireworks when downloading
+      Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+          scanner.start(
+            devices[0].id,
+            {
+              fps: 10,
+              qrbox: { width: 250, height: 250 }
+            },
+            async (decodedText) => {
+              await handleStudentScan(decodedText);
+              setTimeout(startScanner, 2000); // Restart after 2 seconds
+            },
+            (error) => {
+              console.error("Scanner error:", error);
+            }
+          );
+        } else {
+          showAlert(document.getElementById('scan-status'), 'No camera found', 'danger');
+        }
       });
     }
 
-    function shareOnWhatsApp() {
-      const card = document.getElementById("card");
-      if (!card) {
-        alert("Please generate a card first before sharing");
-        return;
-      }
-      
-      const name = document.getElementById("nameInput").value.trim();
-      const text = `සුභ අලුත් අවුරුද්දක් වේවා! ${name} - Powered by Infinity Lab`;
-      
-      // Temporarily hide the music control for the screenshot
-      const musicControl = document.querySelector('.music-control');
-      musicControl.style.visibility = 'hidden';
-      
-      html2canvas(card, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        allowTaint: true
-      }).then(canvas => {
-        // Restore the music control after screenshot
-        musicControl.style.visibility = 'visible';
+    // Handle Student Scan
+    async function handleStudentScan(studentId) {
+      try {
+        const doc = await db.collection("students").doc(studentId).get();
         
-        // Convert canvas to blob
-        canvas.toBlob(function(blob) {
-          // Create form data
-          const formData = new FormData();
-          formData.append('file', blob, 'avurudu-card.jpg');
-          
-          // Create a temporary URL for the blob
-          const url = URL.createObjectURL(blob);
-          
-          // Create a temporary link element
-          const link = document.createElement('a');
-          link.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-          link.setAttribute('data-url', url);
-          link.setAttribute('data-text', text);
-          link.setAttribute('target', '_blank');
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          
-          // Clean up after some time
-          setTimeout(() => {
-            URL.revokeObjectURL(url);
-          }, 1000);
-          
-          createFireworks(); // Add fireworks when sharing
-        }, 'image/jpeg', 0.9);
-      });
+        if (!doc.exists) {
+          showAlert(document.getElementById('scan-status'), 'Student not found', 'danger');
+          return;
+        }
+
+        currentStudent = studentId;
+        const data = doc.data();
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Automatically mark attendance
+        await db.collection("students").doc(studentId).update({
+          [`attendance.${today}`]: true
+        });
+        
+        // Check fee payment
+        if (!data.fees?.[currentMonth]) {
+          showPaymentModal(data.name);
+        }
+        
+        // Update UI
+        updateStudentDisplay(studentId, data.name, data.grade, today);
+        
+      } catch (error) {
+        showAlert(document.getElementById('scan-status'), `Error: ${error.message}`, 'danger');
+      }
     }
 
-    function shareOnFacebook() {
-      const card = document.getElementById("card");
-      if (!card) {
-        alert("Please generate a card first before sharing");
+    // Update Student Display
+    function updateStudentDisplay(id, name, grade, date) {
+      document.getElementById("student-info").classList.remove("hidden");
+      document.getElementById("s-id").textContent = id;
+      document.getElementById("s-name").textContent = name;
+      document.getElementById("s-grade").textContent = grade;
+      
+      // Set attendance status
+      const attendance = document.getElementById("s-attendance");
+      attendance.textContent = "Present";
+      attendance.className = "badge badge-success";
+    }
+
+    // Payment Modal Functions
+    function showPaymentModal(name) {
+      document.getElementById("pay-name").textContent = name;
+      document.getElementById("pay-month").textContent = currentMonth;
+      document.getElementById("payment-modal").style.display = "block";
+    }
+
+    function closeModal() {
+      document.getElementById("payment-modal").style.display = "none";
+    }
+
+    async function processPayment() {
+      const amount = parseFloat(document.getElementById("payment-amount").value);
+      
+      if (!amount || amount <= 0) {
+        alert("Please enter a valid amount");
         return;
       }
       
-      const name = document.getElementById("nameInput").value.trim();
-      const text = `සුභ අලුත් අවුරුද්දක් වේවා! ${name} - Powered by Infinity Lab`;
-      
-      // Temporarily hide the music control for the screenshot
-      const musicControl = document.querySelector('.music-control');
-      musicControl.style.visibility = 'hidden';
-      
-      html2canvas(card, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        allowTaint: true
-      }).then(canvas => {
-        // Restore the music control after screenshot
-        musicControl.style.visibility = 'visible';
-        
-        // Convert canvas to blob
-        canvas.toBlob(function(blob) {
-          const file = new File([blob], "avurudu-card.jpg", { type: "image/jpeg" });
-          
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            navigator.share({
-              title: 'Avurudu Greeting Card',
-              text: text,
-              files: [file]
-            }).catch(err => console.log('Error sharing:', err));
-          } else {
-            // Fallback for browsers that don't support sharing files
-            const url = canvas.toDataURL("image/jpeg", 0.9);
-            const link = document.createElement('a');
-            link.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
-            link.target = '_blank';
-            link.click();
+      try {
+        await db.collection("students").doc(currentStudent).update({
+          [`fees.${currentMonth}`]: {
+            amount: amount,
+            paidAt: new Date().toISOString()
           }
-          
-          createFireworks(); // Add fireworks when sharing
-        }, 'image/jpeg', 0.9);
+        });
+        
+        closeModal();
+        showAlert(document.getElementById('scan-status'), 'Payment recorded!', 'success');
+        
+        // Update fee status
+        document.getElementById("s-fee").textContent = "Paid";
+        document.getElementById("s-fee").className = "badge badge-success";
+      } catch (error) {
+        showAlert(document.getElementById('scan-status'), `Payment failed: ${error.message}`, 'danger');
+      }
+    }
+
+    // Student Management Functions
+    function generateStudentId(name, grade) {
+      const random = Math.floor(1000 + Math.random() * 9000);
+      return `STU-${grade.toUpperCase().substr(0, 3)}-${random}`;
+    }
+
+    async function addStudent() {
+      const name = document.getElementById("new-name").value.trim();
+      const grade = document.getElementById("new-grade").value.trim();
+      const age = document.getElementById("new-age").value;
+      const status = document.getElementById("add-status");
+      
+      if (!name || !grade || !age) {
+        showAlert(status, 'Please fill all fields', 'danger');
+        return;
+      }
+      
+      const id = generateStudentId(name, grade);
+      
+      try {
+        await db.collection("students").doc(id).set({
+          name,
+          grade,
+          age: parseInt(age),
+          attendance: {},
+          fees: {},
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Show generated ID card
+        document.getElementById("student-card").classList.remove("hidden");
+        document.getElementById("student-qr").innerHTML = `
+          <h4>${name}</h4>
+          <p>Grade: ${grade} | Age: ${age}</p>
+          <p><strong>ID:</strong> ${id}</p>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${id}" 
+               alt="Student QR Code" style="margin: 15px 0;">
+        `;
+        
+        showAlert(status, 'Student registered successfully!', 'success');
+        loadStudents();
+        
+        // Clear form
+        document.getElementById("new-name").value = "";
+        document.getElementById("new-grade").value = "";
+        document.getElementById("new-age").value = "";
+      } catch (error) {
+        showAlert(status, `Error: ${error.message}`, 'danger');
+      }
+    }
+
+    // Load All Students
+    async function loadStudents() {
+      try {
+        const snapshot = await db.collection("students").orderBy("createdAt", "desc").get();
+        allStudents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderStudents(allStudents);
+      } catch (error) {
+        console.error("Error loading students:", error);
+      }
+    }
+
+    // Render Students Table
+    function renderStudents(students) {
+      const table = document.getElementById("students-table");
+      const today = new Date().toISOString().split('T')[0];
+      
+      table.innerHTML = students.map(student => {
+        const attended = student.attendance?.[today] ? 
+          '<span class="badge badge-success">Present</span>' : 
+          '<span class="badge badge-danger">Absent</span>';
+        
+        const feeStatus = student.fees?.[currentMonth] ? 
+          '<span class="badge badge-success">Paid</span>' : 
+          '<span class="badge badge-warning">Pending</span>';
+        
+        return `
+          <tr>
+            <td>${student.id}</td>
+            <td>${student.name}</td>
+            <td>${student.grade}</td>
+            <td>${attended}</td>
+            <td>${feeStatus}</td>
+            <td>
+              <button class="btn btn-sm" onclick="viewStudent('${student.id}')">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Search Students
+    function searchStudents() {
+      const term = document.getElementById("search").value.toLowerCase();
+      const filtered = allStudents.filter(student => 
+        student.name.toLowerCase().includes(term) || 
+        student.grade.toLowerCase().includes(term) ||
+        student.id.toLowerCase().includes(term)
+      );
+      renderStudents(filtered);
+    }
+
+    // View Student Details
+    function viewStudent(id) {
+      switchTab('scanner');
+      handleStudentScan(id);
+    }
+
+    // View History
+    function viewHistory() {
+      alert(`Attendance and fee history would be displayed here for ${currentStudent}`);
+      // Implement detailed history view
+    }
+
+    // Print ID Card
+    function printCard() {
+      const content = document.getElementById("student-qr").innerHTML;
+      const win = window.open('', '', 'width=600,height=600');
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Student ID Card</title>
+          <style>
+            body { font-family: Arial; text-align: center; padding: 20px; }
+            img { max-width: 100%; height: auto; }
+          </style>
+        </head>
+        <body>
+          ${content}
+          <script>
+            window.onload = function() { window.print(); };
+          </script>
+        </body>
+        </html>
+      `);
+    }
+
+    // Switch Tabs
+    function switchTab(tabId) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
       });
+      
+      // Deactivate all tab buttons
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Activate selected tab
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+      
+      // Restart scanner if switching to scanner tab
+      if (tabId === 'scanner') {
+        startScanner();
+      }
+    }
+
+    // Show Alert Message
+    function showAlert(element, message, type) {
+      element.textContent = message;
+      element.className = `alert alert-${type}`;
+      element.classList.remove('hidden');
+      setTimeout(() => element.classList.add('hidden'), 5000);
     }
   </script>
 </body>
